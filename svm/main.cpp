@@ -8,14 +8,14 @@
 using namespace cv;
 using namespace std;
 
-#define numTrainingPoints 2000
-#define numTestPoints 200
+#define numTrainingPoints 200
+#define numTestPoints 2000
 #define size 200
 #define eq 0
 
 #define plotSupportVectors
 
-// tpr
+// accuracy
 float evaluate(cv::Mat& predicted, cv::Mat& actual) {
 	assert(predicted.rows == actual.rows);
 	int t = 0;
@@ -113,7 +113,7 @@ void svm(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv:
 		predicted.at<float>(i, 0) = svm.predict(sample);
 	}
 
-	cout << "TPR_{SVM} = " << evaluate(predicted, testClasses) << endl;
+	cout << "Accuracy_{SVM} = " << evaluate(predicted, testClasses) << endl;
 	plot_binary(testData, predicted, "Predictions SVM");
 
 	// plot support vectors
@@ -167,9 +167,62 @@ void mlp(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv:
 
 	}
 
-	cout << "TPR_{MLP} = " << evaluate(predicted, testClasses) << endl;
+	cout << "Accuracy_{MLP} = " << evaluate(predicted, testClasses) << endl;
 	plot_binary(testData, predicted, "Predictions Backpropagation");
 }
+
+void knn(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv::Mat& testClasses, int K) {
+
+	CvKNearest knn(trainingData, trainingClasses, cv::Mat(), false, K);
+	cv::Mat predicted(testClasses.rows, 1, CV_32F);
+	for(int i = 0; i < testData.rows; i++) {
+    		const cv::Mat sample = testData.row(i);
+    		predicted.at<float>(i,0) = knn.find_nearest(sample, K);
+    }
+
+    cout << "Accuracy_{KNN} = " << evaluate(predicted, testClasses) << endl;
+	plot_binary(testData, predicted, "Predictions KNN");
+
+}
+
+void bayes(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv::Mat& testClasses) {
+
+	CvNormalBayesClassifier bayes(trainingData, trainingClasses);
+	cv::Mat predicted(testClasses.rows, 1, CV_32F);
+	for (int i = 0; i < testData.rows; i++) {
+		const cv::Mat sample = testData.row(i);
+		predicted.at<float> (i, 0) = bayes.predict(sample);
+	}
+
+	cout << "Accuracy_{BAYES} = " << evaluate(predicted, testClasses) << endl;
+	plot_binary(testData, predicted, "Predictions Bayes");
+
+}
+
+void decisiontree(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv::Mat& testClasses) {
+
+	CvDTree dtree;
+	cv::Mat var_type(3, 1, CV_8U);
+
+	// define attributes as numerical
+	var_type.at<unsigned int>(0,0) = CV_VAR_NUMERICAL;
+	var_type.at<unsigned int>(0,1) = CV_VAR_NUMERICAL;
+	// define output node as numerical
+	var_type.at<unsigned int>(0,2) = CV_VAR_NUMERICAL;
+
+	dtree.train(trainingData,CV_ROW_SAMPLE, trainingClasses, cv::Mat(), cv::Mat(), var_type, cv::Mat(), CvDTreeParams());
+	cv::Mat predicted(testClasses.rows, 1, CV_32F);
+	for (int i = 0; i < testData.rows; i++) {
+		const cv::Mat sample = testData.row(i);
+		CvDTreeNode* prediction = dtree.predict(sample);
+		predicted.at<float> (i, 0) = prediction->value;
+	}
+
+	cout << "Accuracy_{TREE} = " << evaluate(predicted, testClasses) << endl;
+	plot_binary(testData, predicted, "Predictions tree");
+
+}
+
 
 int main() {
 
@@ -187,9 +240,13 @@ int main() {
 
 	svm(trainingData, trainingClasses, testData, testClasses);
 	mlp(trainingData, trainingClasses, testData, testClasses);
+	knn(trainingData, trainingClasses, testData, testClasses, 3);
+	bayes(trainingData, trainingClasses, testData, testClasses);
+	decisiontree(trainingData, trainingClasses, testData, testClasses);
 
 	cv::waitKey();
 
 	return 0;
 }
+
 
