@@ -13,9 +13,11 @@ To evaluate a predictor it is possible to calculate its accuracy. For two classe
 $$Accuracy = \frac{\mbox{true positive}}{\mbox{true positive} + \mbox{false positive}}$$
 
 The performance of Support Vector Machines and especially Neural Networks depend on the parameters chosen. In case of a neural network it is difficult to find the appropriate parameters and architecture. Designing an Artifical Neural Network is often more a rule of thumb and networks should be optimized iteratively starting with one hidden layer and few neurons. Parameters for a Support Vector Machine can be estimated using Cross Validation and Grid Search (both can be used as \lstinline|train_auto| in OpenCV $\geq$ 2.0).
+ 
+Parameters are not optimized in this experiment, remember to optimize the parameters yourself when using one of the algorithms.
 
-In this evaluation parameters won't be optimized, remember to optimize the parameters yourself when using one of the algorithms.
-
+\subsection{Experiment Data}
+In this experiment linear and non-linear functions are learned. $200$ points for training and $2000$ points for testing are generated.
 
 \subsection{y = 2x}
 
