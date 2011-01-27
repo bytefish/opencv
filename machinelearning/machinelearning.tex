@@ -1,0 +1,107 @@
+\documentclass[10pt]{scrartcl}
+
+\usepackage{abstract}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{tabularx}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+% rand
+\usepackage{geometry}
+\geometry{a4paper, top=25mm, left=30mm, right=25mm, bottom=30mm,
+         headsep=10mm, footskip=12mm}
+
+\usepackage{graphicx}
+\usepackage{url}
+
+\usepackage{graphicx}
+\usepackage[pdftex,colorlinks=true,citecolor=blue,urlcolor=blue,linkcolor=blue]{hyperref}
+
+
+\usepackage{color}
+\usepackage{xcolor}
+
+\usepackage{tabularx}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{lscape}
+%\usepackage{ragged2e}
+
+\usepackage{listings}
+
+\usepackage[margin=10pt]{caption}
+
+\newtheorem{definition}{Definition}
+
+
+\author{Philipp Wagner\thanks{E-Mail: bytefish--at--gmx--dot--de}}
+\title{Statistical Machine Learning with OpenCV}
+%\date{Wintersemester 2010}
+
+\RequirePackage{listings}
+\lstdefinelanguage{pseudocode}{
+morekeywords=[1]{procedure, while, do, endwhile},
+morecomment=[l]{\%}
+}
+
+\lstset{%
+	frame=lines,
+	columns=fullflexible
+}
+
+\definecolor{darkblue}{rgb}{0,0,.6}
+\definecolor{darkred}{rgb}{.6,0,0}
+\definecolor{darkgreen}{rgb}{0,.6,0}
+\definecolor{red}{rgb}{.98,0,0}
+
+\lstloadlanguages{C++}
+\lstset{%
+  language=C++,
+  basicstyle=\tiny\sffamily,
+  commentstyle=\itshape\color{darkgreen},
+  keywordstyle=\bfseries\color{darkblue},
+  stringstyle=\color{darkred},
+  frame=lines,
+  columns=fullflexible,
+  showspaces=false
+}%
+
+% redefine lstinline
+\makeatletter
+\lst@AddToHook{TextStyle}{\let\lst@basicstyle\normalsize\sffamily}
+\makeatother
+
+% change vertical space of itemize and enumeration environments
+\let\olditemize=\itemize
+   \def\itemize{\olditemize\setlength{\itemsep}{-0.5ex}}
+\let\oldenumerate=\enumerate
+   \def\enumerate{\oldenumerate\setlength{\itemsep}{-0.5ex}}
+
+
+\begin{document}
+
+\maketitle
+
+% abstract info
+\begin{abstract}
+This document is an introduction to Machine Learning with OpenCV. Artificial Neural Networks and Support Vector Machines are briefly explained and examples in OpenCV are given.
+\end{abstract}
+
+% include sections
+\input{chapters/introduction.tex}
+\input{chapters/setup.tex}
+\input{chapters/data.tex}
+\input{chapters/svm.tex}
+\input{chapters/mlp.tex}
+\input{chapters/evaluation.tex}
+
+\appendix
+
+% bibliography
+\bibliography{bib/machinelearning}
+\bibliographystyle{alphadin}
+
+\end{document}

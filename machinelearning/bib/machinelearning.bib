@@ -1,0 +1,95 @@
+@Comment {
+
+Typ :: Verwendung :: notwendige Eigenschaften :: Optionale Eigenschaften
+
+article :: Zeitungs- oder Zeitschriftenartikel :: author, title, journal, year :: volume, number, pages, month, note
+
+book ::	Buch ::	author or editor, title, publisher, year :: volume or number, series, address, edition, month, note
+
+phdthesis :: Doktor- oder andere Promotionsarbeit :: author, title, school, year :: type, address, month, note
+
+misc :: Wenn nichts anderes passt. :: - :: author, title, howpublished, month, year, note
+
+techreport :: veröffentlichter Bericht einer Hochschule oder anderen Institution ::	author, title, institution, year :: type, note, number, address, month
+
+BEISPIELE FÜR URL
+-----------------
+
+manual{KEITH,
+ author = "Keith Reckdahl",
+ title  = "Using Imported Graphics in \LaTeXe\ Documents",
+ year   = "1997",
+ month  = dec,
+ note   = "CTAN: \url{tex-archive/info/epslatex.ps}"}
+
+misc{GRANT,
+	author = "Michael C. Grant and David Carlisle",
+	title  = "The PSFrag system, version~3",
+	year   = "1996",
+	month  = nov,
+	howpublished = "CTAN: \url{tex-archive/macros/latex/contrib/%
+	supported/psfrag/pfgguide.tex}"}
+}
+
+@article{culloch1943,
+	author={W. McCulloch and W. Pitts},
+	title={A logical calculus of the ideas immanent in nervous activity.},
+ 	journal={Bulletin of Mathematical Biophysics},
+	volume={5},
+	year={1943},
+	pages={115-133}
+}
+
+@book{werbos1994,
+	author={P.J. Werbos},
+ 	title = {The Roots of Backpropagation: From ordered derivatives to Neural Networks and Political Forecasting},
+	publisher={John Wiley and Sons},
+	year={1994},
+	address={New York}
+}
+@Book{VC74,
+	author = "V. N. Vapnik and A. Ya. Chervonenkis",
+	title =	"Theory of Pattern Recognition [in Russian]",
+	publisher =	"Nauka",
+	year = 	1974,
+	address = 	"USSR",
+	abstract =	"Basis of vapnik's work"
+}
+
+@inproceedings{VC95,
+    author = {Cortes, Corinna and Vapnik, Vladimir},
+    booktitle = {Machine Learning},
+    pages = {273--297},
+    priority = {2},
+    title = {{Support-Vector Networks}},
+    volume = {20},
+    year = {1995}
+}
+
+@Book{Bishop95,
+  author =	 {C. M. Bishop},
+  title =	 {Neural Networks for Pattern Recognition},
+  publisher =	 {Oxford University Press},
+  year =	 {1995},
+  address =	 {Oxford}
+}
+
+@misc{Sa02,
+  author= {Warren S. Sarle},
+  title = {comp.ai.neural-nets FAQ, Part 3 of 7: Generalization},
+  year = {2002},
+  howpublished = "\url{http://www.faqs.org/faqs/ai-faq/neural-nets/part3/}"
+}
+
+@InCollection{HSW92,
+ author = "K.~Hornik and M.~Stinchcombe and H.~White",
+  title =	"Multilayer Feedforward Networks Are Universal Approximators",
+  booktitle =	"Artificial Neural Networks: Approximation and Learning Theory",
+  editor =	"Halber White",
+  publisher =	"Blackwell",
+  address =	"Oxford, UK",
+  year =	"1992",
+  pages =	"12--28"
+}
+
+  
