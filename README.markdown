@@ -4,7 +4,8 @@ This repository contains OpenCV code and documents.
 
 More (maybe) here: [http://www.bytefish.de](http://www.bytefish.de).
 
-## machinelearning ##
+## projects ##
+### machinelearning ###
 Document and sourcecode about OpenCV C++ machine learning API including:
 
 * Support Vector Machines
@@ -12,3 +13,4 @@ Document and sourcecode about OpenCV C++ machine learning API including:
 * Normal Bayes
 * k-Nearest-Neighbor
 * Decision Tree
+
