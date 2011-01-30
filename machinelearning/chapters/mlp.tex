@@ -51,24 +51,24 @@ Where the parameters are (taken from the OpenCV 1.0 documentation\footnote{\url{
 \item \lstinline|train_method| The training algoithm to use; can be one of \lstinline|CvANN_MLP_TrainParams::BACKPROP| (sequential backpropagation algorithm) or \lstinline|CvANN_MLP_TrainParams::RPROP| (RPROP algorithm, default value). 
 
 \item \lstinline|bp_dw_scale|
-    (Backpropagation only): The coefficient to multiply the computed weight gradient by. The recommended value is about 0.1.
+    (Backpropagation only): The coefficient to multiply the computed weight gradient by. The recommended value is about $0.1$.
 \item \lstinline|bp_moment_scale|
-    (Backpropagation only): The coefficient to multiply the difference between weights on the 2 previous iterations. This parameter provides some inertia to smooth the random fluctuations of the weights. It can vary from 0 (the feature is disabled) to 1 and beyond. The value 0.1 or so is good enough.
+    (Backpropagation only): The coefficient to multiply the difference between weights on the $2$ previous iterations. This parameter provides some inertia to smooth the random fluctuations of the weights. It can vary from $0$ (the feature is disabled) to $1$ and beyond. The value $0.1$ or so is good enough.
 \item \lstinline|rp_dw0|
-    (RPROP only): Initial magnitude of the weight delta. The default value is 0.1.
+    (RPROP only): Initial magnitude of the weight delta. The default value is $0.1$.
 \item \lstinline|rp_dw_plus|
-    (RPROP only): The increase factor for the weight delta. It must be >1, default value is 1.2 that should work well in most cases, according to the algorithm's author.
+    (RPROP only): The increase factor for the weight delta. It must be $>1$, default value is $1.2$ that should work well in most cases, according to the algorithm's author.
 \item \lstinline|rp_dw_minus|
-    (RPROP only): The decrease factor for the weight delta. It must be <1, default value is 0.5 that should work well in most cases, according to the algorithm's author.
+    (RPROP only): The decrease factor for the weight delta. It must be $<1$, default value is $0.5$ that should work well in most cases, according to the algorithm's author.
 \item \lstinline|rp_dw_min|
-    (RPROP only): The minimum value of the weight delta. It must be >0, the default value is \lstinline|FLT_EPSILON|. 
+    (RPROP only): The minimum value of the weight delta. It must be $>0$, the default value is \lstinline|FLT_EPSILON|. 
 \item \lstinline|rp_dw_max|
-    (RPROP only): The maximum value of the weight delta. It must be >1, the default value is 50. 
+    (RPROP only): The maximum value of the weight delta. It must be $>1$, the default value is $50$. 
 \end{itemize}
 
 
 \subsubsection*{Layers}
-The purpose of a neural network is to generalize, which is the ability to approximate outputs for inputs not available in the training set. \cite{Sa02} While small networks may not be able to approximate a function, large networks tend to overfit and not find any relationship in data.\footnote{The model describes random error or noise instead of the relationship of the data.} It has been shown that, given enough data, a multi layer perceptron with one hidden layer can approximate any continuous function to any degree of accuracy.\cite{HSW92}
+The purpose of a neural network is to generalize, which is the ability to approximate outputs for inputs not available in the training set. \cite{Sa02} While small networks may not be able to approximate a function, large networks tend to overfit and not find any relationship in data.\footnote{The model describes random error or noise instead of the relationship of the data.} It has been shown that, given enough data, a multi layer perceptron with one hidden layer can approximate any continuous function to any degree of accuracy. \cite{HSW92}
 
 The number of neurons per layer is stored in a row-ordered \lstinline|cv::Mat|.
 
