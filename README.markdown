@@ -13,4 +13,5 @@ Document and sourcecode about OpenCV C++ machine learning API including:
 * Normal Bayes
 * k-Nearest-Neighbor
 * Decision Tree
-
+### eigenfaces ###
+Simple Eigenfaces implementation using OpenCV2.2. Dataset available at [http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html](http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html).
