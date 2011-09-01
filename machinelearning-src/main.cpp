@@ -8,12 +8,11 @@
 using namespace cv;
 using namespace std;
 
-#define numTrainingPoints 200
-#define numTestPoints 2000
-#define size 200
-#define eq 0
-
-#define plotSupportVectors
+bool plotSupportVectors=true;
+int numTrainingPoints=200;
+int numTestPoints=2000;
+int size=200;
+int eq=0;
 
 // accuracy
 float evaluate(cv::Mat& predicted, cv::Mat& actual) {
@@ -117,18 +116,17 @@ void svm(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv:
 	plot_binary(testData, predicted, "Predictions SVM");
 
 	// plot support vectors
-#ifdef plotSupportVectors
-	cv::Mat plot_sv(size, size, CV_8UC3);
-	plot_sv.setTo(CV_RGB(255,255,255));
+	if(plotSupportVectors) {
+		cv::Mat plot_sv(size, size, CV_8UC3);
+		plot_sv.setTo(CV_RGB(255,255,255));
 
-	int svec_count = svm.get_support_vector_count();
-	for(int vecNum = 0; vecNum < svec_count; vecNum++) {
-		const float* vec = svm.get_support_vector(vecNum);
-		cv::circle(plot_sv, Point(vec[0]*size, vec[1]*size), 3 , CV_RGB(0, 0, 0));
-	}
+		int svec_count = svm.get_support_vector_count();
+		for(int vecNum = 0; vecNum < svec_count; vecNum++) {
+			const float* vec = svm.get_support_vector(vecNum);
+			cv::circle(plot_sv, Point(vec[0]*size, vec[1]*size), 3 , CV_RGB(0, 0, 0));
+		}
 	cv::imshow("Support Vectors", plot_sv);
-#endif
-
+	}
 }
 
 void mlp(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv::Mat& testClasses) {
