@@ -95,21 +95,24 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	reverseByRow(_eigenvalues, _eigenvalues);
 	reverseByCol(_eigenvectors, _eigenvectors);
 
+	// and now take only the num_components
+	_eigenvalues = Mat(_eigenvalues, Range(0,_num_components), Range::all());
+	_eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
 }
 
 void subspace::LinearDiscriminantAnalysis::project(const Mat& src, Mat& dst) {
 	if(_dataAsRow) {
-		gemm(src, _eigenvectors, 1.0, Mat(), 0, dst, CV_GEMM_B_T);
+		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst, CV_GEMM_A_T + CV_GEMM_B_T);
 	} else {
-		gemm(src, _eigenvectors, 1.0, Mat(), 0, dst, CV_GEMM_A_T + CV_GEMM_B_T);
+		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst,  CV_GEMM_A_T);
 	}
 }
 
 void subspace::LinearDiscriminantAnalysis::reconstruct(const Mat& src, Mat& dst) {
 	if(_dataAsRow) {
-		gemm(src, _eigenvectors, 1.0, Mat(), 0, dst);
+		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst, CV_GEMM_B_T);
 	} else {
-		gemm(src, _eigenvectors, 1.0, Mat(), 0, dst, CV_GEMM_A_T);
+		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst);
 	}
 }
 

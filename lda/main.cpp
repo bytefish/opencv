@@ -30,8 +30,15 @@ int main(int argc, const char *argv[]) {
 	//d =
 	//	 1.5195e+00
 	//   6.5052e-18
-	cout << lda.eigenvalues() << endl;
+	cout << "Eigenvalues:" << endl << lda.eigenvalues() << endl;
 	// Eigen outputs:
 	// [1.519536390756363; 9.980626757982641e-19]
+
+	cout << "Eigenvectors:" << endl << lda.eigenvectors() << endl;
+	// project a data sample onto the subspace identified by LDA
+	Mat x = _data.row(0);
+	cout << "Projection of " << x << ": " << endl;
+	cout << lda.project(x) << endl;
+	// ...
 	return 0;
 }
