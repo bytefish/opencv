@@ -55,3 +55,5 @@ Fisherfaces implementation with the OpenCV2 C++ API. Here's my [answer on stacko
   * http://www.bytefish.de/blog/fisherfaces
   * http://www.bytefish.de/blog/lda_in_opencv
   * http://www.bytefish.de/blog/fisherfaces_in_opencv
+
+
