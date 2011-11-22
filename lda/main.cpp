@@ -30,18 +30,6 @@
 using namespace cv;
 using namespace std;
 
-Mat toGrayscale(const Mat& mat) {
-	Mat gMat(mat.rows, mat.cols, CV_8UC1);
-	double min, max;
-	minMaxLoc(mat, &min, &max);
-	for(int row = 0; row < mat.rows; row++) {
-		for(int col = 0; col < mat.cols; col++) {
-			gMat.at<uchar>(row, col) = 255 * ((mat.at<float>(row, col) - min) / (max - min));
-		}
-	}
-	return gMat;
-}
-
 void read_csv(const string& filename, vector<string>& files, vector<int>& classes) {
 	std::ifstream file(filename.c_str(), ifstream::in);
 	if(file) {
@@ -92,7 +80,6 @@ int main(int argc, const char *argv[]) {
 
 	cout << "Eigenvectors:" << endl << lda.eigenvectors() << endl;
 
-	return 0;
 	// project a data sample onto the subspace identified by LDA
 	Mat x = _data.row(0);
 	cout << "Projection of " << x << ": " << endl;
