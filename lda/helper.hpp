@@ -2,52 +2,41 @@
 #define __HELPER_HPP__
 
 #include "opencv/cxcore.h"
+#include <vector>
 #include <eigen3/Eigen/Dense>
+
+using namespace std;
 
 namespace cv
 {
+//! sort order for shuffle
+template<typename _Tp>
+class SortByFirstAscending_;
 
-void swapByCol(Mat& src, int idx0, int idx1) {
-		Mat col0 = src.col(idx0);
-		Mat col1 = src.col(idx1);
-		Mat tmp(col0.rows, 1, src.type());
-		col0.copyTo(tmp);
-		col1.copyTo(col0);
-		tmp.copyTo(col1);
-}
+//! descending sort operator
+template<typename _Tp>
+class SortByFirstDescending_;
 
-void reverseByCol(const Mat& src, Mat& dst) {
-	src.copyTo(dst);
-	for(int i = 0, j = src.cols-1; i < j; i++, j--)
-		swapByCol(dst,i,j);
-}
+void sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices);
+Mat sortMatrixByColumn(const Mat& src, vector<int> sorted_indices);
 
-Mat reverseByCol(const Mat& src) {
-	Mat dst;
-	reverseByCol(src, dst);
-	return dst;
+void sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices);
+Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
 
-}
-void swapByRow(Mat& src, int idx0, int idx1) {
-		Mat row0 = src.row(idx0);
-		Mat row1 = src.row(idx1);
-		Mat tmp(1, src.cols, src.type());
-		row0.copyTo(tmp);
-		row1.copyTo(row0);
-		tmp.copyTo(row1);
-}
+template<typename _Tp>
+vector<int> argsort_(const Mat& src, bool asc=true);
+vector<int> argsort(const Mat& src, bool asc=true);
 
-void reverseByRow(const Mat& src, Mat& dst) {
-	src.copyTo(dst);
-	for(int i = 0, j = src.rows-1; i < j; i++, j--)
-		swapByRow(dst,i,j);
-}
+void swapByCol(Mat& src, int idx0, int idx1);
 
-Mat reverseByRow(const Mat& src) {
-	Mat dst;
-	reverseByRow(src, dst);
-	return dst;
-}
+void reverseByCol(const Mat& src, Mat& dst);
+
+Mat reverseByCol(const Mat& src);
+
+void swapByRow(Mat& src, int idx0, int idx1);
+
+void reverseByRow(const Mat& src, Mat& dst);
+Mat reverseByRow(const Mat& src);
 
 
 template<typename _Tp, int _rows, int _cols, int _options, int _maxRows, int _maxCols>

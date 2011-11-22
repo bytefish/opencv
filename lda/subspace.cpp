@@ -77,25 +77,29 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 		add(Sb, tmp, Sb);
 	}
 
-	// i am only using doubles here, make a templated version to allow MatrixXf
-	MatrixXd Swe, Sbe;
+	Mat Swi = Sw.inv();
+	cout << "Swi=" << Swi << endl;
+	Mat M;
+	gemm(Swi, Sb, 1.0, Mat(), 0.0, M);
 
-	// convert to Eigen Datatypes
-	cv2eigen(Sw, Swe);
-	cv2eigen(Sb, Sbe);
-
+	// now switch to eigen!
+	MatrixXd Me;
+	cv2eigen(M, Me);
 	// solve generalized eigenvalue problem
-	Eigen::GeneralizedSelfAdjointEigenSolver<MatrixXd> es(Sbe, Swe);
+	Eigen::EigenSolver<MatrixXd> es(Me);
 
-	// copy and we are done!
-	eigen2cv(es.eigenvectors(), _eigenvectors);
-	eigen2cv(es.eigenvalues(), _eigenvalues);
+	// copy real values over to opencv
+	eigen2cv(MatrixXd(es.eigenvectors().real()), _eigenvectors);
+	eigen2cv(MatrixXd(es.eigenvalues().real()), _eigenvalues);
 
-	// eigen sorts ascending, so reverse the result
-	reverseByRow(_eigenvalues, _eigenvalues);
-	reverseByCol(_eigenvectors, _eigenvectors);
+	// sort descending by eigenvalue
+	vector<int> sorted_indices = argsort(_eigenvalues, false);
 
-	// and now take only the num_components
+	// now sort eigenvalues and eigenvectors accordingly
+	_eigenvalues = sortMatrixByRow(_eigenvalues, sorted_indices);
+	_eigenvectors = sortMatrixByColumn(_eigenvectors, sorted_indices);
+
+	// and now take only the num_components and you are done
 	_eigenvalues = Mat(_eigenvalues, Range(0,_num_components), Range::all());
 	_eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
 }
