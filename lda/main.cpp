@@ -77,6 +77,7 @@ int main(int argc, const char *argv[]) {
 	Mat x = _data.row(0);
 	cout << "Projection of " << x << ": " << endl;
 	cout << lda.project(x) << endl;
+
 	// ...
 
 	vector<string> files;
@@ -110,12 +111,12 @@ int main(int argc, const char *argv[]) {
 
 	// show first 10 eigenfaces
 	for(int i = 0; i < max(1, min(10, model.eigenvectors().cols)); i++) {
-			stringstream ss;
-			ss << i;//add number to the stream
-			Mat normalized;
-			normalize(model.eigenvectors().col(i), normalized, 0, 255, NORM_MINMAX, CV_8UC1);
-			imshow(ss.str(), normalized.reshape(1, img.rows));
-		}
+		stringstream ss;
+		ss << i;//add number to the stream
+		Mat normalized;
+		normalize(model.eigenvectors().col(i), normalized, 0, 255, NORM_MINMAX, CV_8UC1);
+		imshow(ss.str(), normalized.reshape(1, img.rows));
+	}
 	waitKey(0);
 	return 0;
 }

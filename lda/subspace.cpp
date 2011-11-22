@@ -78,7 +78,6 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	}
 
 	Mat Swi = Sw.inv();
-	cout << "Swi=" << Swi << endl;
 	Mat M;
 	gemm(Swi, Sb, 1.0, Mat(), 0.0, M);
 
@@ -92,14 +91,14 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	eigen2cv(MatrixXd(es.eigenvectors().real()), _eigenvectors);
 	eigen2cv(MatrixXd(es.eigenvalues().real()), _eigenvalues);
 
-	// sort descending by eigenvalue
+	// get sorted indices descending by eigenvalue
 	vector<int> sorted_indices = argsort(_eigenvalues, false);
 
 	// now sort eigenvalues and eigenvectors accordingly
 	_eigenvalues = sortMatrixByRow(_eigenvalues, sorted_indices);
 	_eigenvectors = sortMatrixByColumn(_eigenvectors, sorted_indices);
 
-	// and now take only the num_components and you are done
+	// and now take only the num_components and you are done here!
 	_eigenvalues = Mat(_eigenvalues, Range(0,_num_components), Range::all());
 	_eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
 }
