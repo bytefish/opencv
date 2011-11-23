@@ -26,13 +26,12 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	// assert type
 	if((src.type() != CV_32FC1) && (src.type() != CV_64FC1))
 		CV_Error(CV_StsBadArg, "src must be a valid matrix float or double matrix");
-
+	// we want double precision, so convert
 	Mat data;
-	src.convertTo(data, CV_64FC1); // we want to work with double precision!
+	src.convertTo(data, CV_64FC1);
 	// turn into row vector samples
 	if(!_dataAsRow)
 		transpose(data,data);
-
 	// assert, that labels are valid 32bit signed integer values
 	if(labels.size() != data.rows)
 		CV_Error(CV_StsBadArg, "labels array must be a valid 1d integer vector of len(src) elements");
@@ -40,29 +39,24 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	int N = data.rows; //! number of samples
 	int D = data.cols; //! dimension of samples
 	int C = *max_element(labels.begin(), labels.end()) + 1; //! number of classes
-
 	// within scatter matrix will be singular
 	if(N < D)
 		cout << "Less instances than feature dimension! Computation will probably fail." << endl;
-
-
 	// There are atmost (C-1) non-zero eigenvalues!
 	if((_num_components > (C-1)) || (_num_components < 1)) {
 		_num_components = C-1;
 		cout << "num_components set to: " << _num_components << "!" << endl;
 	}
-
+	// holds the mean over all classes
 	Mat meanTotal = Mat::zeros(1, D, data.type());
-
+	// holds the mean for each class
 	Mat meanClass[C];
 	int numClass[C];
-
 	// initialize
 	for (int i = 0; i < C; i++) {
 		numClass[i] = 0;
 		meanClass[i] = Mat::zeros(1, D, data.type()); //! Dx1 image vector
 	}
-
 	// calculate class means and total mean
 	for (int i = 0; i < N; i++) {
 		Mat instance = data.row(i);
@@ -94,29 +88,24 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 		mulTransposed(tmp, tmp, true);
 		add(Sb, tmp, Sb);
 	}
-
+	// this will fail if Sw is singular
 	Mat Swi = Sw.inv();
 	Mat M;
 	gemm(Swi, Sb, 1.0, Mat(), 0.0, M);
-
-	// now switch to eigen!
+	// now switch to eigen (cv2eigen defined in helper.hpp)
 	MatrixXd Me;
 	cv2eigen(M, Me);
-	// solve generalized eigenvalue problem
+	// solve eigenvalue problem for the general matrix $M = Sw^{-1} Sb$
 	Eigen::EigenSolver<MatrixXd> es(Me);
-
 	// copy real values over to opencv
 	eigen2cv(MatrixXd(es.eigenvectors().real()), _eigenvectors);
 	eigen2cv(MatrixXd(es.eigenvalues().real()), _eigenvalues);
-
 	// get sorted indices descending by eigenvalue
 	vector<int> sorted_indices = argsort(_eigenvalues, false);
-
 	// now sort eigenvalues and eigenvectors accordingly
 	_eigenvalues = sortMatrixByRow(_eigenvalues, sorted_indices);
 	_eigenvectors = sortMatrixByColumn(_eigenvectors, sorted_indices);
-
-	// and now take only the num_components and you are done here!
+	// and now take only the num_components and we're out!
 	_eigenvalues = Mat(_eigenvalues, Range(0,_num_components), Range::all());
 	_eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
 }

@@ -28,8 +28,16 @@ using namespace std;
 namespace subspace {
 
 /**
- * \class LinearDiscriminantAnalysis
- * \brief Performs a Multiclass Discriminant Analysis for given data.
+ * Fisherfaces
+ *
+ * Implements the Fisherfaces method as described in:
+ *
+ *  * P. Belhumeur, J. Hespanha, and D. Kriegman,
+ *    "Eigenfaces vs. Fisherfaces: Recognition Using Class Specific Linear Projection",
+ *    IEEE Transactions on Pattern Analysis and Machine Intelligence,
+ *    19(7):711--720,
+ *    1997.
+ *
  */
 class Fisherfaces {
 

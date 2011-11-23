@@ -24,29 +24,25 @@
 
 
 void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {
-
 	// assert type
 	if((src.type() != CV_32FC1) && (src.type() != CV_64FC1))
 		CV_Error(CV_StsBadArg, "src must be a valid matrix float or double matrix");
-
+	// we want double precision, so convert
 	Mat data;
-	src.convertTo(data, CV_64FC1); // we want to work with double precision!
+	src.convertTo(data, CV_64FC1);
 	// turn into row vector samples
 	if(!_dataAsRow)
 		transpose(data,data);
-
 	if(labels.size() != data.rows)
 		CV_Error(CV_StsBadArg, "labels array must be a valid 1d integer vector of len(src) elements");
-
 	// store labels
 	_labels = labels;
-
 	// compute fisherfaces
 	int N = data.rows; //! number of samples
 	int D = data.cols; //! dimension of samples
 	int C = *max_element(labels.begin(), labels.end()) + 1; //! number of classes
 	PCA pca(data, Mat(), CV_PCA_DATA_AS_ROW, (N-C));
-	LinearDiscriminantAnalysis lda(pca.project(data),labels, C-1, true);
+	LinearDiscriminantAnalysis lda(pca.project(data),labels, C-1);
 	lda.eigenvalues().copyTo(_eigenvalues);
 	gemm(pca.eigenvectors, lda.eigenvectors(), 1.0, Mat(), 0.0, _eigenvectors, CV_GEMM_A_T);
 	// store projections
