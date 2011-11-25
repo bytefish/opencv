@@ -59,41 +59,5 @@ int main(int argc, const char *argv[]) {
 	save_image(prefix + string("mkpj1.jpg"), img, colormap::MKPJ1());
 	save_image(prefix + string("mkpj2.jpg"), img, colormap::MKPJ2());
 
-return 0;
-
-	int deviceId = 0;
-	if(argc > 1)
-		deviceId = atoi(argv[1]);
-
-	VideoCapture cap(deviceId);
-
-	if(!cap.isOpened()) {
-    	cerr << "Capture Device ID " << deviceId << "cannot be opened." << endl;
-    	return -1;
-    }
-
-    namedWindow("gray",CV_WINDOW_AUTOSIZE);
-    namedWindow("colored",CV_WINDOW_AUTOSIZE);
-
-    Mat frame, gray, colored;
-
-    bool running=true;
-    while(running) {
-    	cap >> frame;
-
-    	// comment the following lines for original size
-    	resize(frame, frame, Size(), 0.5, 0.5);
-    	cvtColor(frame, gray, CV_BGR2GRAY);
-
-    	imshow("gray", frame);
-    	imshow("colored", colored);
-
-    	char key = (char) waitKey(20);
-
-    	// exit on escape
-    	if(key == 27)
-    		running=false;
-
-    }
-    	return 0; // success
+	return 0; // success
 }
