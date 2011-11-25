@@ -11,7 +11,6 @@ Mat cv::linspace(float x0, float x1, int n) {
 	return pts;
 }
 
-//! sort order for shuffle
 template<typename _Tp>
 class cv::SortByFirstAscending_ {
 public:
@@ -20,7 +19,6 @@ public:
 	}
 };
 
-//! descending sort operator
 template<typename _Tp>
 class cv::SortByFirstDescending_ {
 public:
@@ -58,7 +56,6 @@ Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
 	return dst;
 }
 
-
 template<typename _Tp>
 vector<int> cv::argsort_(const Mat& src, bool asc=true) {
 	if(src.rows != 1 && src.cols != 1)
@@ -80,7 +77,6 @@ vector<int> cv::argsort_(const Mat& src, bool asc=true) {
 	return indices;
 }
 
-//! get
 vector<int> cv::argsort(const Mat& src, bool asc) {
 	switch(src.type()) {
 		case CV_8SC1: return argsort_<char>(src,asc); break;
@@ -92,7 +88,6 @@ vector<int> cv::argsort(const Mat& src, bool asc) {
 		case CV_64FC1: return argsort_<double>(src,asc); break;
 	}
 }
-
 
 void cv::diff(const Mat& src, Mat& dst) {
 	if(src.rows != 1 && src.cols != 1)
@@ -109,13 +104,13 @@ Mat cv::diff(const Mat& src) {
 	diff(src, dst);
 	return dst;
 }
+
 template <typename _Tp>
 int nearest_bin_(const Mat& src, _Tp value)
 {
   int low = 0;
   int high = src.rows-1;
-
-  // get left-most insertion bin
+  // first find the left-most insertion bin
   while (low <= high) {
 	int mid = (low + high) / 2;
 	if (src.at<_Tp>(mid,0) > value) {
@@ -126,13 +121,13 @@ int nearest_bin_(const Mat& src, _Tp value)
 		return mid;
 	}
   }
-  // value is lower than first
+  // left-most point found
   if(low == 0)
 	  return 0;
-  // check which boundary is closer
+  // left boundary
   if(src.at<_Tp>(low-1) < src.at<_Tp>(low))
 	  return low-1;
-  // return left-most
+  // right boundary is closer
   return low;
 }
 
@@ -154,16 +149,16 @@ int cv::nearest_bin(const Mat& src, _Tp value)
 
 template <typename _Tp>
 Mat interp1_(const Mat& X, const Mat& Y, const Mat& xi) {
-	// stores sorted values
+	// Xs,Ys for sorted interpolation tables
 	Mat Xs, Ys;
 	int n = xi.rows;
-	// sort data by X values
+	// sort both vectors
 	vector<int> sort_indices = argsort(X);
 	Xs = sortMatrixByRow(X,sort_indices);
 	Ys = sortMatrixByRow(Y,sort_indices);
 	// calc interpolation weights
 	Mat dy = diff(Ys)/diff(Xs);
-	// now interpolate values
+	// then interpolate values (lineary), probably enhance it here for cubic interpolation...
 	Mat yi = Mat::zeros(xi.size(), xi.type());
 	for(int i = 0; i < n; i++) {
 		int valIdx = nearest_bin(Xs,xi.at<_Tp>(i,0));

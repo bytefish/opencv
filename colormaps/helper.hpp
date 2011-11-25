@@ -23,7 +23,7 @@
 
 namespace cv {
 
-//! linspace
+//! MATLAB-equivalent: linspace
 Mat linspace(float x0, float x1, int n);
 
 //! ascending sort operator
@@ -34,7 +34,7 @@ class SortByFirstAscending_;
 template<typename _Tp>
 class SortByFirstDescending_;
 
-//! works like MATLAB/NumPy argsort (only vector sorting supported)
+//! works like MATLAB/NumPy-equivalent argsort (only 1D sorting supported)
 template<typename _Tp>
 vector<int> argsort_(const Mat& src, bool asc=true);
 vector<int> argsort(const Mat& src, bool asc=true);
@@ -51,11 +51,11 @@ Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
 void diff(const Mat& src, Mat& dst);
 Mat diff(const Mat& src);
 
-//! returns the left-most insertion point
+//! return the left-most insertion point
 template <typename _Tp>
 int nearest_bin(const Mat& src, _Tp value);
 
-//! linear interpolation
+//! perform linear interpolation on two interpolation table columns
 Mat interp1(const Mat& X, const Mat& Y, const Mat& xi);
 
 

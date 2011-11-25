@@ -35,11 +35,7 @@ protected:
 public:
 	ColorMap() {}
 
-	/*
-	 * \brief apply this colormap table.
-	 * \param src number of linearly interpolated sample points from 0...1
-	 * \todo Rewrite to use abritrary sized LUT (cv::lut requires exactely 256 values)
-	 */
+	//! apply this colormap on source image
 	Mat operator()(const Mat& src) const {
 		if(_lut.total() != 256)
 			CV_Error(CV_StsNotImplemented, "Abritrary sized LUT not implemented yet.");
@@ -48,50 +44,20 @@ public:
 		return dst;
 	}
 
-	/*
-	 * \brief Builds a Lookup Table.
-	 *
-	 * \param n number of linearly interpolated sample points from 0...1
-	 */
+	//! setup base map to interpolate from
 	virtual void init(int n) = 0;
 
-	/*
-	 * \brief Builds a Lookup Table.
-	 *
-	 * \param X breakpoints
-	 * \param r red values
-	 * \param g green values
-	 * \param b blue values
-	 * \param n linearly interpolated sample points from 0...1
-	 */
+	//! interpolates from a base colormap
 	void linear_colormap(const Mat& X, const Mat& r, const Mat& g, const Mat& b, int n) {
 		linear_colormap(X,r,g,b,linspace(0,1,n));
 	}
 
-	/*
-	 * \brief Builds a Lookup Table.
-	 *
-	 * \param X breakpoints
-	 * \param r red values
-	 * \param g green values
-	 * \param b blue values
-	 * \param begin inclusive start value to begin interpolation
-	 * \param end inclusive end value to end interpolation
-	 * \param n linearly interpolated sample points from [begin,...,end]
-	 */
+	//! interpolates from a base colormap
 	void linear_colormap(const Mat& X, const Mat& r, const Mat& g, const Mat& b, float begin, float end, float n) {
 		linear_colormap(X,r,g,b,linspace(begin,end,n));
 	}
 
-	/*
-	 * \brief Builds a Lookup Table.
-	 *
-	 * \param X breakpoints
-	 * \param r red values
-	 * \param g green values
-	 * \param b blue values
-	 * \param xi points to interpolate
-	 */
+	//! interpolates from a base colormap
 	void linear_colormap(const Mat& X, const Mat& r, const Mat& g, const Mat& b, const Mat& xi) {
 		Mat planes[] = {
 				interp1(X, b, xi),
@@ -100,7 +66,9 @@ public:
 		merge(planes, 3, _lut);
 	}
 };
-/**
+
+/*
+// use this skeleton to implement a new colormap!
 class Skeleton : public ColorMap {
 public:
 	Skeleton() : ColorMap() {
@@ -123,8 +91,9 @@ public:
 				n);  // number of sample points
 	}
 };
-**/
+*/
 
+// equals GNU Octave colormap jet
 class Jet : public ColorMap {
 
 public:
@@ -176,6 +145,7 @@ public:
 	}
 };
 
+// equals GNU Octave colormap winter
 class Winter : public ColorMap {
 public:
 	Winter() : ColorMap() {
@@ -199,6 +169,7 @@ public:
 	}
 };
 
+// equals GNU Octave colormap rainbow
 class Rainbow : public ColorMap {
 public:
 	Rainbow() : ColorMap() {
@@ -222,7 +193,7 @@ public:
 	}
 };
 
-
+// equals GNU Octave colormap ocean
 class Ocean : public ColorMap {
 public:
 	Ocean() : ColorMap() {
@@ -246,6 +217,7 @@ public:
 	}
 };
 
+// equals GNU Octave colormap summer
 class Summer : public ColorMap {
 public:
 	Summer() : ColorMap() {
@@ -269,6 +241,7 @@ public:
 	}
 };
 
+// equals GNU Octave colormap spring
 class Spring : public ColorMap {
 public:
 	Spring() : ColorMap() {
@@ -292,6 +265,7 @@ public:
 	}
 };
 
+// equals GNU Octave colormap cool
 class Cool : public ColorMap {
 public:
 	Cool() : ColorMap() {
@@ -315,6 +289,7 @@ public:
 	}
 };
 
+// equals GNU Octave colormap hsv
 class HSV : public ColorMap {
 public:
 	HSV() : ColorMap() {
@@ -338,6 +313,7 @@ public:
 	}
 };
 
+// equals GNU Octave colormap pink
 class Pink : public ColorMap {
 public:
 	Pink() : ColorMap() {
@@ -361,7 +337,7 @@ public:
 	}
 };
 
-
+// equals GNU Octave colormap hot
 class Hot : public ColorMap {
 public:
 	Hot() : ColorMap() {
@@ -384,7 +360,6 @@ public:
 				n);  // number of sample points
 	}
 };
-
 
 
 /*

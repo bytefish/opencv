@@ -15,11 +15,9 @@
  *
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
-
-#include <iostream>
+#include <string>
 #include <cv.h>
 #include <highgui.h>
-
 #include "colormap.hpp"
 //#include "helper.hpp"
 
