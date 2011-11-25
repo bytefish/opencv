@@ -4,6 +4,14 @@ This repository contains OpenCV code and documents.
 
 More (maybe) here: [http://www.bytefish.de](http://www.bytefish.de).
 
+## colormaps ##
+
+An implementation of various colormaps for OpenCV2 C++ in order to enhance visualizations. Feel free to fork and add your own colormaps.
+
+### Related posts ###
+
+  * http://bytefish.de/blog/colormaps_in_opencv
+
 ## machinelearning ##
 
 Document and sourcecode about OpenCV C++ machine learning API including:
@@ -54,5 +62,4 @@ Fisherfaces implementation with the OpenCV2 C++ API. Here's my [answer on stacko
   * http://www.bytefish.de/blog/fisherfaces
   * http://www.bytefish.de/blog/lda_in_opencv
   * http://www.bytefish.de/blog/fisherfaces_in_opencv
-
 
