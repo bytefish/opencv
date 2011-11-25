@@ -46,8 +46,9 @@ int main(int argc, const char *argv[]) {
 		roi +=i;
 	}
 	string prefix("colorscale_");
+	save_image(prefix + string("autumn.jpg"), img, colormap::Autumn());
+	save_image(prefix + string("bone.jpg"), img, colormap::Bone());
 	save_image(prefix + string("jet.jpg"), img, colormap::Jet());
-	save_image(prefix + string("blueorange.jpg"), img, colormap::BlueOrange());
 	save_image(prefix + string("winter.jpg"), img, colormap::Winter());
 	save_image(prefix + string("rainbow.jpg"), img, colormap::Rainbow());
 	save_image(prefix + string("ocean.jpg"), img, colormap::Ocean());
