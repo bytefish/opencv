@@ -26,12 +26,15 @@ using namespace std;
 
 
 void save_image(const string filename, const Mat& src, const colormap::ColorMap& colorMap) {
-	Mat dst = src.clone();
-	if(dst.channels() == 1)
-		cvtColor(dst, dst, CV_GRAY2BGR);
-	dst = colorMap(dst);
-	normalize(dst, dst, 0, 255, NORM_MINMAX, CV_8UC3);
-	imwrite(filename, dst);
+	Mat img = src.clone();
+	// make sure it's ok for cv::LUT...
+	cvtColor(img, img, CV_GRAY2BGR);
+	normalize(img, img, 0, 255, NORM_MINMAX, CV_8UC3);
+	// apply the color map
+	img = colorMap(img);
+	// normalize it to display / save it with highgui tools
+	normalize(img, img, 0, 255, NORM_MINMAX, CV_8UC3);
+	imwrite(filename, img);
 }
 
 int main(int argc, const char *argv[]) {
