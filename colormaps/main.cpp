@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) 2011. Philipp Wagner <bytefish[at]gmx[dot]de>.
+ * Released to public domain under terms of the BSD Simplified license.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the organization nor the names of its contributors
+ *     may be used to endorse or promote products derived from this software
+ *     without specific prior written permission.
+ *
+ *   See <http://www.opensource.org/licenses/bsd-license>
+ */
+
+#include <iostream>
+#include <cv.h>
+#include <highgui.h>
+
+#include "colormap.hpp"
+//#include "helper.hpp"
+
+using namespace cv;
+using namespace std;
+
+
+void save_image(const string filename, const Mat& src, const colormap::ColorMap& colorMap) {
+	Mat dst = src.clone();
+	if(dst.channels() == 1)
+		cvtColor(dst, dst, CV_GRAY2BGR);
+	dst = colorMap(dst);
+	normalize(dst, dst, 0, 255, NORM_MINMAX, CV_8UC3);
+	imwrite(filename, dst);
+}
+
+int main(int argc, const char *argv[]) {
+
+	//Mat img = imread("image.jpg",0);
+	Mat img = Mat::zeros(30, 256, CV_8UC1);
+	for(int i = 0; i < 256; i++) {
+		Mat roi = Mat(img, Range::all(), Range(i,i+1));
+		roi +=i;
+	}
+	string prefix("colorscale_");
+	save_image(prefix + string("jet.jpg"), img, colormap::Jet());
+	save_image(prefix + string("blueorange.jpg"), img, colormap::BlueOrange());
+	save_image(prefix + string("winter.jpg"), img, colormap::Winter());
+	save_image(prefix + string("rainbow.jpg"), img, colormap::Rainbow());
+	save_image(prefix + string("ocean.jpg"), img, colormap::Ocean());
+	save_image(prefix + string("summer.jpg"), img, colormap::Summer());
+	save_image(prefix + string("spring.jpg"), img, colormap::Spring());
+	save_image(prefix + string("cool.jpg"), img, colormap::Cool());
+	save_image(prefix + string("hsv.jpg"), img, colormap::HSV());
+	save_image(prefix + string("pink.jpg"), img, colormap::Pink());
+	save_image(prefix + string("hot.jpg"), img, colormap::Hot());
+	save_image(prefix + string("mkpj1.jpg"), img, colormap::MKPJ1());
+	save_image(prefix + string("mkpj2.jpg"), img, colormap::MKPJ2());
+
+return 0;
+
+	int deviceId = 0;
+	if(argc > 1)
+		deviceId = atoi(argv[1]);
+
+	VideoCapture cap(deviceId);
+
+	if(!cap.isOpened()) {
+    	cerr << "Capture Device ID " << deviceId << "cannot be opened." << endl;
+    	return -1;
+    }
+
+    namedWindow("gray",CV_WINDOW_AUTOSIZE);
+    namedWindow("colored",CV_WINDOW_AUTOSIZE);
+
+    Mat frame, gray, colored;
+
+    bool running=true;
+    while(running) {
+    	cap >> frame;
+
+    	// comment the following lines for original size
+    	resize(frame, frame, Size(), 0.5, 0.5);
+    	cvtColor(frame, gray, CV_BGR2GRAY);
+
+    	imshow("gray", frame);
+    	imshow("colored", colored);
+
+    	char key = (char) waitKey(20);
+
+    	// exit on escape
+    	if(key == 27)
+    		running=false;
+
+    }
+    	return 0; // success
+}
