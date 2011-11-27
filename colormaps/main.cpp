@@ -33,7 +33,7 @@ void save_image(const string filename, const Mat& src, const colormap::ColorMap&
 
 int main(int argc, const char *argv[]) {
 	//	simple example with an image
-//	Mat img0 = imread("image.jpg",0);
+//	Mat img0 = imread("01.jpg",0);
 //	colormap::Hot cm;
 //	imshow("cm", cm(img0));
 //	waitKey(0);

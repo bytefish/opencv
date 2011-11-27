@@ -40,12 +40,10 @@ public:
 		if(_lut.total() != 256)
 			CV_Error(CV_StsNotImplemented, "Abritrary sized LUT not implemented yet.");
 		Mat img = src.clone();
-		// convert to CV_8UC3
-		if(img.type() != CV_8UC3) {
-			cvtColor(img, img, CV_GRAY2BGR);
-			normalize(img, img, 0, 255, NORM_MINMAX, CV_8UC3);
-		}
-		// apply colormap
+		// not grayscale? turn into grayscale intensities
+		if(img.type() != CV_8UC1)
+			cvtColor(img, img, CV_BGR2GRAY);
+		cvtColor(img, img, CV_GRAY2BGR);
 		LUT(img, _lut, img);
 		return img;
 	}
