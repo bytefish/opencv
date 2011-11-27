@@ -39,10 +39,10 @@ public:
 	Mat operator()(Mat src) const {
 		if(_lut.total() != 256)
 			CV_Error(CV_StsNotImplemented, "Abritrary sized LUT not implemented yet.");
-		// not grayscale? turn into grayscale intensities
 		if(src.type() != CV_8UC1)
 			cvtColor(src, src, CV_BGR2GRAY);
 		cvtColor(src, src, CV_GRAY2BGR);
+		normalize(src, src, 0.0, 255.0, CV_MINMAX, CV_8UC3); // why can't cv::LUT do this?
 		LUT(src, _lut, src);
 		return src;
 	}
