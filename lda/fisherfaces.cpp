@@ -21,7 +21,7 @@
 #include "subspace.hpp"
 #include <limits>
 #include <cmath>
-
+#include <eigen3/Eigen/Dense>
 
 void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {
 	// assert type

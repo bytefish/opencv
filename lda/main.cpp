@@ -30,47 +30,14 @@
 using namespace cv;
 using namespace std;
 
-Mat linspace(float x0, float x1, int n) {
-	Mat pts(n, 1, CV_32FC1);
-	double step = (x1-x0)/floor(n-1);
-	for(int i = 0; i < n; i++)
-		pts.at<float>(i,0) = x0+i*step;
-	return pts;
-}
-
-Mat lut_red_to_blue() {
-	Mat roi, lut;
-
-	// ... red
-	Mat red = Mat::zeros(256, 1,CV_32FC1);
-	roi = Mat(red, Range(127,192), Range::all());
-	roi += linspace(0,1,65);
-	roi = Mat(red, Range(192,256), Range::all());
-	roi += 1;
-
-	// ... green
-	Mat green = Mat::zeros(256,1,CV_32FC1);
-	roi = Mat(green, Range(0,64), Range::all());
-	roi += linspace(0,1,64);
-	roi = Mat(green, Range(64,192), Range::all());
-	roi += 1;
-	roi = Mat(green, Range(192,256), Range::all());
-	roi += linspace(1, 0, 64);
-
-	// ... blue
-	Mat blue = Mat::zeros(256,1,CV_32FC1);
-	roi = Mat(blue, Range(0,64), Range::all());
-	roi += 1;
-	roi = Mat(blue, Range(64,128), Range::all());
-	roi += linspace(1, 0, 64);
-	Mat planes[] = {blue,green,red};
-
-	// ... finally merge them
-	merge(planes, 3, lut);
-	return lut;
-}
-
-
+/*
+ * Read images from a given path.
+ *
+ * example.txt:
+ *   <path>;<img>
+ *   <path>;<img>
+ *   [...]
+ */
 void read_csv(const string& filename, vector<string>& files, vector<int>& classes) {
 	std::ifstream file(filename.c_str(), ifstream::in);
 	if(file) {
@@ -90,8 +57,7 @@ void read_csv(const string& filename, vector<string>& files, vector<int>& classe
 
 
 int main(int argc, const char *argv[]) {
-
-	// example from: http://www.bytefish.de/wiki/pca_lda_with_gnu_octave
+	// example taken from: http://www.bytefish.de/wiki/pca_lda_with_gnu_octave
 	double d[11][2] = {
 			{2, 3},
 			{3, 4},
@@ -105,7 +71,6 @@ int main(int argc, const char *argv[]) {
 			{6, 4},
 			{7, 6}};
 	int c[11] = {0,0,0,0,0,1,1,1,1,1,1};
-
 	// convert into OpenCV representation
 	Mat _data = Mat(11, 2, CV_64FC1, d).clone();
 	vector<int> _classes(c, c + sizeof(c) / sizeof(int));
@@ -157,18 +122,14 @@ int main(int argc, const char *argv[]) {
 
 	cout << "predicted class = " << predicted << endl;
 	cout << "actual class = " << classes[numImages-1] << endl;
-	Mat lut = lut_red_to_blue();
+	stringstream ss;
 	// show first 10 eigenfaces
 	for(int i = 0; i < max(1, min(10, model.eigenvectors().cols)); i++) {
-		stringstream ss;
 		ss << "fisherface_" << i;
 		Mat v;
 		model.eigenvectors().col(i).copyTo(v);
 		normalize(v, v, 0, 255, NORM_MINMAX, CV_8UC1);
-		cvtColor(v, v, CV_GRAY2BGR);
-		LUT(v, lut, v);
-		normalize(v, v, 0, 255, NORM_MINMAX, CV_8UC3);
-		imshow(ss.str(), v.reshape(3, img.rows));
+		imshow(ss.str(), v.reshape(1, img.rows));
 	}
 	waitKey(0);
 	return 0;
