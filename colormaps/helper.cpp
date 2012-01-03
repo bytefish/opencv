@@ -107,7 +107,6 @@ Mat cv::diff(const Mat& src) {
 
 template <typename _Tp>
 Mat interp1_(const Mat& X_, const Mat& Y_, const Mat& XI) {
-	// Xs,Ys for sorted interpolation tables
 	int n = XI.rows;
 	// sort input table
 	vector<int> sort_indices = argsort(X_);
@@ -134,7 +133,8 @@ Mat interp1_(const Mat& X_, const Mat& Y_, const Mat& XI) {
 			}
 		}
 		// linear interpolation
-		yi.at<_Tp>(i,0) += Y.at<_Tp>(low,0) + (XI.at<_Tp>(i,0) - X.at<_Tp>(low,0)) * (Y.at<_Tp>(high,0) - Y.at<_Tp>(low,0))/(X.at<_Tp>(high,0)-X.at<_Tp>(low,0));
+		yi.at<_Tp>(i,0) += Y.at<_Tp>(low,0) + (XI.at<_Tp>(i,0) - X.at<_Tp>(low,0)) *
+				(Y.at<_Tp>(high,0) - Y.at<_Tp>(low,0)) / (X.at<_Tp>(high,0) - X.at<_Tp>(low,0));
 	}
 	return yi;
 }
