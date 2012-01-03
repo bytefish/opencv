@@ -106,63 +106,35 @@ Mat cv::diff(const Mat& src) {
 }
 
 template <typename _Tp>
-int nearest_bin_(const Mat& src, _Tp value)
-{
-  int low = 0;
-  int high = src.rows-1;
-  // first find the left-most insertion bin
-  while (low <= high) {
-	int mid = (low + high) / 2;
-	if (src.at<_Tp>(mid,0) > value) {
-	  high = mid - 1;
-	} else if(src.at<_Tp>(mid,0) < value) {
-	  low = mid + 1;
-	} else {
-		return mid;
-	}
-  }
-  // left-most point found
-  if(low == 0)
-	  return 0;
-  // left boundary
-  if(src.at<_Tp>(low-1) < src.at<_Tp>(low))
-	  return low-1;
-  // right boundary is closer
-  return low;
-}
-
-template <typename _Tp>
-int cv::nearest_bin(const Mat& src, _Tp value)
-{
-  if(src.cols!=1)
-		  CV_Error(CV_StsBadArg, "Only row vectors allowed.");
-	switch(src.type()) {
-		case CV_8SC1: return nearest_bin_<char>(src,value); break;
-		case CV_8UC1: return nearest_bin_<unsigned char>(src,value); break;
-		case CV_16SC1: return nearest_bin_<short>(src,value); break;
-		case CV_16UC1: return nearest_bin_<unsigned short>(src,value); break;
-		case CV_32SC1: return nearest_bin_<int>(src,value); break;
-		case CV_32FC1: return nearest_bin_<float>(src,value); break;
-		case CV_64FC1: return nearest_bin_<double>(src,value); break;
-	}
-}
-
-template <typename _Tp>
-Mat interp1_(const Mat& X, const Mat& Y, const Mat& xi) {
+Mat interp1_(const Mat& X_, const Mat& Y_, const Mat& XI) {
 	// Xs,Ys for sorted interpolation tables
-	Mat Xs, Ys;
-	int n = xi.rows;
-	// sort both vectors
-	vector<int> sort_indices = argsort(X);
-	Xs = sortMatrixByRow(X,sort_indices);
-	Ys = sortMatrixByRow(Y,sort_indices);
-	// calc interpolation weights
-	Mat dy = diff(Ys)/diff(Xs);
-	// then interpolate values (lineary), probably enhance it here for cubic interpolation...
-	Mat yi = Mat::zeros(xi.size(), xi.type());
+	int n = XI.rows;
+	// sort input table
+	vector<int> sort_indices = argsort(X_);
+	Mat X = sortMatrixByRow(X_,sort_indices);
+	Mat Y = sortMatrixByRow(Y_,sort_indices);
+	// interpolated values
+	Mat yi = Mat::zeros(XI.size(), XI.type());
 	for(int i = 0; i < n; i++) {
-		int valIdx = nearest_bin(Xs,xi.at<_Tp>(i,0));
-		yi.at<_Tp>(i,0) += Ys.at<_Tp>(valIdx,0) + dy.at<_Tp>(valIdx, 0) * (xi.at<_Tp>(i,0) - Xs.at<_Tp>(valIdx,0));
+		int c = 0;
+		int low = 0;
+		int high = X.rows - 1;
+		// set bounds
+		if(XI.at<_Tp>(i,0) < X.at<_Tp>(low, 0))
+			high = 1;
+		if(XI.at<_Tp>(i,0) > X.at<_Tp>(high, 0))
+			low = high - 1;
+		// binary search
+		while((high-low)>1) {
+			c = low + ((high - low) >> 1);
+			if(XI.at<_Tp>(i,0) > X.at<_Tp>(c,0)) {
+				low = c;
+			} else {
+				high = c;
+			}
+		}
+		// linear interpolation
+		yi.at<_Tp>(i,0) += Y.at<_Tp>(low,0) + (XI.at<_Tp>(i,0) - X.at<_Tp>(low,0)) * (Y.at<_Tp>(high,0) - Y.at<_Tp>(low,0))/(X.at<_Tp>(high,0)-X.at<_Tp>(low,0));
 	}
 	return yi;
 }

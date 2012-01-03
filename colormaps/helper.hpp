@@ -51,9 +51,6 @@ Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
 void diff(const Mat& src, Mat& dst);
 Mat diff(const Mat& src);
 
-//! return the left-most insertion point
-template <typename _Tp>
-int nearest_bin(const Mat& src, _Tp value);
 
 //! perform linear interpolation on two interpolation table columns
 Mat interp1(const Mat& X, const Mat& Y, const Mat& xi);

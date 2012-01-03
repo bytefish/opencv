@@ -19,7 +19,7 @@
 #include <cv.h>
 #include <highgui.h>
 #include "colormap.hpp"
-//#include "helper.hpp"
+#include "helper.hpp"
 
 using namespace cv;
 using namespace std;
@@ -32,17 +32,18 @@ void save_image(const string filename, const Mat& src, const colormap::ColorMap&
 }
 
 int main(int argc, const char *argv[]) {
-	//	simple example with an image
-//	Mat img0 = imread("01.jpg",0);
-//	colormap::Hot cm;
-//	imshow("cm", cm(img0));
-//	waitKey(0);
+	//	example with an image
+	Mat img0 = imread("01.jpg",1);
+	colormap::Jet cm;
+	imshow("cm", cm(img0));
+	waitKey(0);
 
 	Mat img1 = Mat::zeros(30, 256, CV_8UC1);
 	for(int i = 0; i < 256; i++) {
 		Mat roi = Mat(img1, Range::all(), Range(i,i+1));
 		roi += i;
 	}
+
 	string prefix("colorscale_");
 	save_image(prefix + string("autumn.jpg"), img1, colormap::Autumn());
 	save_image(prefix + string("bone.jpg"), img1, colormap::Bone());
