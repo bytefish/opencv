@@ -39,8 +39,11 @@ public:
 	Mat operator()(Mat src) const {
 		if(_lut.total() != 256)
 			CV_Error(CV_StsNotImplemented, "Abritrary-sized LUT not implemented yet.");
-		if(src.type() != CV_8UC1)
+		// convert CV_8UC3 to CV_8UC1
+		if(src.type() == CV_8UC3)
 			cvtColor(src, src, CV_BGR2GRAY);
+		if(src.type() != CV_8UC1)
+			CV_Error(CV_StsBadArg, "Only CV_8U images supported.");
 		cvtColor(src, src, CV_GRAY2BGR);
 		LUT(src, _lut, src);
 		return src;
