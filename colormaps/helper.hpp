@@ -51,6 +51,8 @@ Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
 void diff(const Mat& src, Mat& dst);
 Mat diff(const Mat& src);
 
+//! normalize each channel of a multi-channel matrix
+void normalize_m(const Mat& src, const Mat& dst, double alpha, double beta, int norm_type, int dtype, const Mat& mask);
 
 //! perform linear interpolation on two interpolation table columns
 Mat interp1(const Mat& X, const Mat& Y, const Mat& xi);

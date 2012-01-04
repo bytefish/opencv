@@ -27,7 +27,7 @@ using namespace std;
 
 void save_image(const string filename, const Mat& src, const colormap::ColorMap& cm) {
 	Mat img = cm(src);
-	normalize(img, img, 0, 255, NORM_MINMAX, CV_8UC3);
+	img.convertTo(img, CV_8UC3, 255.0);
 	imwrite(filename, img);
 }
 
