@@ -39,14 +39,15 @@ public:
 	Mat operator()(Mat src) const {
 		if(_lut.total() != 256)
 			CV_Error(CV_StsNotImplemented, "Abritrary-sized LUT not implemented yet.");
-		// convert CV_8UC3 to CV_8UC1
-		if(src.type() == CV_8UC3)
-			cvtColor(src, src, CV_BGR2GRAY);
-		if(src.type() != CV_8UC1)
+		if(src.type() != CV_8UC1 && src.type() != CV_8UC3)
 			CV_Error(CV_StsBadArg, "Only CV_8U images supported.");
-		cvtColor(src, src, CV_GRAY2BGR);
-		LUT(src, _lut, src);
-		return src;
+		Mat tmp = src.clone();
+		// turn into grayscale
+		if(src.type() == CV_8UC3)
+			cvtColor(src, tmp, CV_BGR2GRAY);
+		cvtColor(tmp, src, CV_GRAY2BGR);
+		LUT(src, _lut, tmp);
+		return tmp;
 	}
 
 	//! setup base map to interpolate from

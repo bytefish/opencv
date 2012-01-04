@@ -32,9 +32,10 @@ void save_image(const string filename, const Mat& src, const colormap::ColorMap&
 }
 
 int main(int argc, const char *argv[]) {
-	//	example with an image
+	// example with an image
 	Mat img0 = imread("01.jpg",1);
 	colormap::Jet cm;
+
 	imshow("cm", cm(img0));
 	waitKey(0);
 
