@@ -104,7 +104,7 @@ int main(int argc, const char *argv[]) {
 	// get dimension from first image
 	Mat img = imread(files[0], 0);
 	int total = img.cols * img.rows;
-	// read the data, each image is a row
+	// read in the data, each row is an image
 	Mat data(numImages, total, CV_32FC1);
 	for(int instanceIdx = 0; instanceIdx < files.size() - 1; instanceIdx++) {
 		Mat xi = data.row(instanceIdx);
