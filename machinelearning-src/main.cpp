@@ -34,7 +34,7 @@ float evaluate(cv::Mat& predicted, cv::Mat& actual) {
 // plot data and class
 void plot_binary(cv::Mat& data, cv::Mat& classes, string name) {
 	cv::Mat plot(size, size, CV_8UC3);
-	plot.setTo(CV_RGB(255,255,255));
+	plot.setTo(cv::Scalar(255.0,255.0,255.0));
 	for(int i = 0; i < data.rows; i++) {
 
 		float x = data.at<float>(i,0) * size;
@@ -118,7 +118,7 @@ void svm(cv::Mat& trainingData, cv::Mat& trainingClasses, cv::Mat& testData, cv:
 	// plot support vectors
 	if(plotSupportVectors) {
 		cv::Mat plot_sv(size, size, CV_8UC3);
-		plot_sv.setTo(CV_RGB(255,255,255));
+		plot_sv.setTo(cv::Scalar(255.0,255.0,255.0));
 
 		int svec_count = svm.get_support_vector_count();
 		for(int vecNum = 0; vecNum < svec_count; vecNum++) {
