@@ -28,7 +28,7 @@ using namespace std;
 
 /**
  * \class LinearDiscriminantAnalysis
- * \brief Performs a Multiclass Discriminant Analysis for given data.
+ * \brief Performs a Multiclass Discriminant Analysis.
  */
 class LinearDiscriminantAnalysis {
 

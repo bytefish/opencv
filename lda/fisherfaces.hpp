@@ -38,6 +38,7 @@ namespace subspace {
  *    19(7):711--720,
  *    1997.
  *
+ * TODO Use OpenCVs KNearestNeighbor class
  */
 class Fisherfaces {
 
@@ -67,24 +68,24 @@ public:
 
 	~Fisherfaces() {}
 
-	//! compute the discriminants for data in src and labels
+	// compute the discriminants for data in src and labels
 	void compute(const Mat& src, const vector<int>& labels);
 
-	//! project
+	// project
 	void project(const Mat& src, Mat& dst);
 	Mat project(const Mat& src);
 
-	//! reconstruct
+	// reconstruct
 	void reconstruct(const Mat& src, Mat& dst);
 	Mat reconstruct(const Mat& src);
 
-	//! returns a const reference to the eigenvectors of this LDA
+	// returns a const reference to the eigenvectors of this LDA
 	const Mat& eigenvectors() const { return _eigenvectors; };
 
-	//! returns a const reference to the eigenvalues of this LDA
+	// returns a const reference to the eigenvalues of this LDA
 	const Mat& eigenvalues() const { return _eigenvalues; }
 
-	//! return nearest neighbor to query
+	// returns the nearest neighbor to a query
 	int predict(const Mat& src);
 };
 }

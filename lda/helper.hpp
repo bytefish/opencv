@@ -42,20 +42,8 @@ void sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices);
 Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
 
 template<typename _Tp>
-vector<int> argsort_(const Mat& src, bool asc=true);
-vector<int> argsort(const Mat& src, bool asc=true);
-
-void swapByCol(Mat& src, int idx0, int idx1);
-
-void reverseByCol(const Mat& src, Mat& dst);
-
-Mat reverseByCol(const Mat& src);
-
-void swapByRow(Mat& src, int idx0, int idx1);
-
-void reverseByRow(const Mat& src, Mat& dst);
-Mat reverseByRow(const Mat& src);
-
+vector<int> argsort_(const Mat& src, bool sortAscending=true);
+vector<int> argsort(const Mat& src, bool sortAscending=true);
 
 template<typename _Tp, int _rows, int _cols, int _options, int _maxRows, int _maxCols>
 void eigen2cv( const Eigen::Matrix<_Tp, _rows, _cols, _options, _maxRows, _maxCols>& src, Mat& dst )
