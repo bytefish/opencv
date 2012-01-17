@@ -38,16 +38,15 @@ public:
 	//! apply this colormap on source image
 	Mat operator()(Mat src) const {
 		if(_lut.total() != 256)
-			CV_Error(CV_StsNotImplemented, "Abritrary-sized LUT not implemented yet.");
+			CV_Error(CV_StsNotImplemented, "Arbitrary-sized LUT not supported yet.");
 		if(src.type() != CV_8UC1 && src.type() != CV_8UC3)
 			CV_Error(CV_StsBadArg, "Only CV_8U images supported.");
-		Mat tmp = src.clone();
 		// turn into grayscale
 		if(src.type() == CV_8UC3)
-			cvtColor(src, tmp, CV_BGR2GRAY);
-		cvtColor(tmp, src, CV_GRAY2BGR);
-		LUT(src, _lut, tmp);
-		return tmp;
+			cvtColor(src.clone(), src, CV_BGR2GRAY);
+		cvtColor(src.clone(), src, CV_GRAY2BGR);
+		LUT(src.clone(), _lut, src);
+		return src;
 	}
 
 	//! setup base map to interpolate from
