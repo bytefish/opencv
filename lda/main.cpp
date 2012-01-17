@@ -31,12 +31,13 @@ using namespace cv;
 using namespace std;
 
 /*
- * Read images from a given path.
- *
- * example.txt:
- *   <path>;<img>
- *   <path>;<img>
- *   [...]
+ * Read image filenames and corresponding classes from a CSV file. Example CSV file:
+ *	/path/to/image0.jpg;0
+ *	/path/to/image1.jpg;0
+ *	/path/to/image2.jpg;0
+ *	/path/to/image3.jpg;1
+ *	/path/to/image4.jpg;1
+ *	...
  */
 void read_csv(const string& filename, vector<string>& files, vector<int>& classes) {
 	std::ifstream file(filename.c_str(), ifstream::in);
@@ -84,46 +85,42 @@ int main(int argc, const char *argv[]) {
 	cout << "Eigenvalues:" << endl << lda.eigenvalues() << endl;
 	// Eigen outputs:
 	// [1.519536390756363; 9.980626757982641e-19]
-
 	cout << "Eigenvectors:" << endl << lda.eigenvectors() << endl;
-
 	// project a data sample onto the subspace identified by LDA
 	Mat x = _data.row(0);
 	cout << "Projection of " << x << ": " << endl;
 	cout << lda.project(x) << endl;
-
-	// ...
-
+	// hold the path to the image and corresponding class
 	vector<string> files;
 	vector<int> classes;
-
-	read_csv("/home/philipp/facerec/data/yaleface.txt", files, classes);
+	// Example of a CSV File
+	//
+	// CSV -- https://github.com/bytefish/opencv/blob/master/lda/at.txt
+	// Database -- http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html
+	//
+	// Always make sure classes are given as {0, 1,..., n}!
+	read_csv("/path/to/your/database.txt", files, classes);
 	int numImages = files.size();
-
 	// get dimension from first image
 	Mat img = imread(files[0], 0);
 	int total = img.cols * img.rows;
-
-	Mat data(total, numImages, CV_32FC1);
+	// read the data, each image is a row
+	Mat data(numImages, total, CV_32FC1);
 	for(int instanceIdx = 0; instanceIdx < files.size() - 1; instanceIdx++) {
-		Mat xi = data.col(instanceIdx);
+		Mat xi = data.row(instanceIdx);
 		Mat tmp_img;
 		imread(files[instanceIdx], 0).convertTo(tmp_img, CV_32FC1, 1/255.);
-		tmp_img.reshape(1, total).copyTo(xi);
+		tmp_img.reshape(1, 1).copyTo(xi);
 	}
-
-	// turn into row-order
-	transpose(data,data);
-
+	// build the Fisherfaces model (data is in row)
 	subspace::Fisherfaces model(data, classes);
 	// test model (with last image...)
 	imread(files[numImages - 1],0).convertTo(img, CV_32FC1, 1/255.);
 	int predicted = model.predict(img.reshape(1, 1));
-
 	cout << "predicted class = " << predicted << endl;
 	cout << "actual class = " << classes[numImages-1] << endl;
 	stringstream ss;
-	// show first 10 eigenfaces
+	// show first 10 Fisherfaces
 	for(int i = 0; i < max(1, min(10, model.eigenvectors().cols)); i++) {
 		ss << "fisherface_" << i;
 		Mat v;
