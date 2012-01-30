@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
 	Eigenfaces eigenfaces(images, labels, num_components);
 	// get a prediction
 	int predicted = eigenfaces.predict(testSample);
-	cout << "actual=" << testLabel << " / predicted=" << predicted;
+	cout << "actual=" << testLabel << " / predicted=" << predicted << endl;
 	// see the reconstruction with num_components
 	Mat p = eigenfaces.project(images[0].reshape(1,1));
 	Mat r = eigenfaces.reconstruct(p);
@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
 		Mat ev = W.col(i).clone();
 		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}
+	// wait forever
 	waitKey(0);
 	return 0;
 }

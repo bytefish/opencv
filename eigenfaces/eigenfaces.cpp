@@ -4,14 +4,12 @@
 Eigenfaces::Eigenfaces(const Mat& src, const vector<int>& labels, int num_components, bool dataAsRow) {
 	_num_components = num_components;
 	_dataAsRow = dataAsRow;
-	// compute the pca for observations given in row (dataAsRow = true) or columns (dataAsRow = false)
 	compute(src, labels);
 }
 
 Eigenfaces::Eigenfaces(const vector<Mat>& src, const vector<int>& labels, int num_components) {
 	_num_components = num_components;
 	_dataAsRow = true;
-	// turn into row matrix and compute
 	compute(asRowMatrix(src), labels);
 }
 
@@ -44,8 +42,8 @@ void Eigenfaces::compute(const vector<Mat>& src, const vector<int>& labels) {
 	compute(asRowMatrix(src), labels);
 }
 
-int Eigenfaces::predict(const Mat& instance) {
-	Mat q = project(instance.reshape(1,1));
+int Eigenfaces::predict(const Mat& src) {
+	Mat q = project(_dataAsRow ? src.reshape(1,1) :	src.reshape(1, src.total()));
 	// find 1-nearest neighbor
 	double minDist = numeric_limits<double>::max();
 	int minClass = -1;
