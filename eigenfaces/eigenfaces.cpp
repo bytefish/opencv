@@ -20,6 +20,9 @@ void Eigenfaces::compute(const Mat& src, const vector<int>& labels) {
 	int n = data.rows;
 	// dimensionality of data
 	int d = data.cols;
+	// assert there are as much samples as labels
+	if(n != labels.size())
+		CV_Error(CV_StsBadArg, "The number of samples must equal the number of labels!");
 	// clip number of components to be valid
 	_num_components = max(1, min(_num_components, n));
 	// perform the PCA
