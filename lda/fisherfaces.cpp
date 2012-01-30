@@ -27,10 +27,16 @@
 subspace::Fisherfaces::Fisherfaces(
 		const vector<Mat>& src,
 		const vector<int>& labels,
-		int num_components) {
+		int num_components,
+		bool dataAsRow) {
 	_num_components = num_components;
-	_dataAsRow = true;
-	compute(asRowMatrix(src), labels);
+	_dataAsRow = dataAsRow;
+	// compute the fisherfaces
+	compute(src, labels);
+}
+
+void subspace::Fisherfaces::compute(const vector<Mat>& src, const vector<int>& labels) {
+	compute(_dataAsRow? asRowMatrix(src) : asColumnMatrix(src), labels);
 }
 
 void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {

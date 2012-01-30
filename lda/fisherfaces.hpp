@@ -56,9 +56,14 @@ public:
 		_num_components(0),
 		_dataAsRow(true) {};
 
+	Fisherfaces(int num_components, bool dataAsRow = true) :
+		_num_components(num_components),
+		_dataAsRow(dataAsRow) {};
+
 	Fisherfaces(const vector<Mat>& src,
 			const vector<int>& labels,
-			int num_components = 0);
+			int num_components = 0,
+			bool dataAsRow = true);
 
 
 	Fisherfaces(const Mat& src,
