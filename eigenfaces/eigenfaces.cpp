@@ -33,9 +33,9 @@ void Eigenfaces::compute(const Mat& src, const vector<int>& labels) {
 			CV_PCA_DATA_AS_ROW,
 			_num_components);
 	// set the data
-	_mean = pca.mean.clone(); // store the mean vector
+	_mean = _dataAsRow ? pca.mean.reshape(1,1) : pca.mean.reshape(1, pca.mean.total()); // store the mean vector
 	_eigenvalues = pca.eigenvalues.clone(); // store the eigenvectors
-	_eigenvectors = transpose(pca.eigenvectors); // OpenCV stores the Eigenvectors by row
+	_eigenvectors = transpose(pca.eigenvectors); // OpenCV stores the Eigenvectors by row (??)
 	_labels = vector<int>(labels); // store labels for projections
 	// projections
 	for(int sampleIdx = 0; sampleIdx < data.rows; sampleIdx++) {
@@ -67,7 +67,7 @@ Mat Eigenfaces::project(const Mat& src) {
 	int n = _dataAsRow ? src.rows : src.cols;
 	// center data
 	subtract(_dataAsRow ? src : transpose(src),
-			repeat(_mean, n, 1),
+			repeat(_mean.reshape(1,1), n, 1),
 			X,
 			Mat(),
 			_eigenvectors.type());
@@ -83,7 +83,7 @@ Mat Eigenfaces::reconstruct(const Mat& src) {
 	gemm(_dataAsRow ? src : transpose(src),
 			_eigenvectors,
 			1.0,
-			repeat(_mean, n, 1),
+			repeat(_mean.reshape(1,1), n, 1),
 			1.0,
 			X,
 			GEMM_2_T);
