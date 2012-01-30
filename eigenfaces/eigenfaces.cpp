@@ -40,6 +40,10 @@ void Eigenfaces::compute(const Mat& src, const vector<int>& labels) {
 	}
 }
 
+void Eigenfaces::compute(const vector<Mat>& src, const vector<int>& labels) {
+	compute(asRowMatrix(src), labels);
+}
+
 int Eigenfaces::predict(const Mat& instance) {
 	Mat q = project(instance.reshape(1,1));
 	// find 1-nearest neighbor
