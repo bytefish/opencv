@@ -11,34 +11,26 @@
 #include <limits>
 #include <iterator>
 
-#include "Eigenfaces.h"
+#include "helper.hpp"
+#include "eigenfaces.hpp"
 
 using namespace std;
 using namespace cv;
 
-Mat toGrayscale(const Mat& mat) {
-	Mat gMat(mat.rows, mat.cols, CV_8UC1);
-	double min, max;
-	minMaxLoc(mat, &min, &max);
-	for(int row = 0; row < mat.rows; row++) {
-		for(int col = 0; col < mat.cols; col++) {
-			gMat.at<uchar>(row, col) = 255 * ((mat.at<float>(row, col) - min) / (max - min));
-		}
-	}
-	return gMat;
-}
-
-void read_csv(const string& filename, vector<string>& files, vector<int>& classes) {
+void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels) {
 	std::ifstream file(filename.c_str(), ifstream::in);
 	if(file) {
 		std::string line, path, classlabel;
+		// for each line
 		while (std::getline(file, line)) {
+			// get current line
 			std::stringstream liness(line);
+			// split line
 			std::getline(liness, path, ';');
 			std::getline(liness, classlabel);
-
-			files.push_back(path);
-			classes.push_back(atoi(classlabel.c_str()));
+			// push pack the data
+			images.push_back(imread(path,0));
+			labels.push_back(atoi(classlabel.c_str()));
 		}
 	} else {
 		cerr << "Error: Failed to open file.";
@@ -46,40 +38,37 @@ void read_csv(const string& filename, vector<string>& files, vector<int>& classe
 }
 
 int main(int argc, char *argv[]) {
-	vector<string> files;
-	vector<int> classes;
-
-	read_csv("./at.txt", files, classes);
-	int numImages = files.size();
-
-	// get dimension from first image
-	Mat img = imread(files[0], 0);
-	int total = img.cols * img.rows;
-
-	Mat data(total, numImages, CV_32FC1);
-	for(int instanceIdx = 0; instanceIdx < files.size() - 1; instanceIdx++) {
-		Mat xi = data.col(instanceIdx);
-		Mat tmp_img;
-		imread(files[instanceIdx], 0).convertTo(tmp_img, CV_32FC1, 1/255.);
-		tmp_img.reshape(1, total).copyTo(xi);
-	}
-
-	// learn model
-	Eigenfaces eigenfaces(data, classes, 20);
-
-	// test model (with last image...)
-	imread(files[numImages - 1],0).convertTo(img, CV_32FC1, 1/255.);
-	int predicted = eigenfaces.predict(img.reshape(1, total));
-
-	cout << "predicted class = " << predicted << endl;
-	cout << "actual class = " << classes[numImages-1] << endl;
-
+	vector<Mat> images;
+	vector<int> labels;
+	// read images
+	read_csv("./at.txt", images, labels);
+	// get width and height
+	int width = images[0].cols;
+	int height = images[0].rows;
+	// get test instances
+	Mat testSample = images[images.size()-1];
+	int testLabel = labels[labels.size()-1];
+	// ... and delete last element
+	images.pop_back();
+	labels.pop_back();
+	// num_components eigenfaces
+	int num_components = 80;
+	// compute the eigenfaces
+	Eigenfaces eigenfaces(images, labels, num_components);
+	// get a prediction
+	int predicted = eigenfaces.predict(testSample);
+	cout << "actual=" << testLabel << " / predicted=" << predicted;
+	// see the reconstruction with num_components
+	Mat p = eigenfaces.project(images[0].reshape(1,1));
+	Mat r = eigenfaces.reconstruct(p);
+	imshow("original", images[0]);
+	imshow("reconstruction", toGrayscale(r.reshape(1, height)));
+	// get the eigenvectors
+	Mat W = eigenfaces.eigenvectors();
 	// show first 10 eigenfaces
-	for(int i = 0; i < 19; i++) {
-		stringstream ss;
-		ss << i;//add number to the stream
-		imshow(ss.str(), toGrayscale(eigenfaces.eigenvectors().row(i)).reshape(1, img.rows));
+	for(int i = 0; i < 10; i++) {
+		Mat ev = W.col(i).clone();
+		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}
-
 	waitKey(0);
 }
