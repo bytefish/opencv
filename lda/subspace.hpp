@@ -21,7 +21,14 @@
 
 #include <cv.h>
 
+using namespace cv;
+
 namespace subspace {
+
+//! project samples into W
+Mat project(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow = true);
+//! reconstruct samples into W
+Mat reconstruct(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow = true);
 
 using namespace cv;
 using namespace std;
@@ -44,6 +51,10 @@ public:
 		_num_components(0),
 		_dataAsRow(true) {};
 
+	LinearDiscriminantAnalysis(int num_components, bool dataAsRow = true) :
+		_num_components(num_components),
+		_dataAsRow(dataAsRow) {};
+
 	LinearDiscriminantAnalysis(const Mat& src,
 			const vector<int>& labels,
 			int num_components = 0,
@@ -60,11 +71,9 @@ public:
 	void compute(const Mat& src, const vector<int>& labels);
 
 	//! project
-	void project(const Mat& src, Mat& dst);
 	Mat project(const Mat& src);
 
 	//! reconstruct
-	void reconstruct(const Mat& src, Mat& dst);
 	Mat reconstruct(const Mat& src);
 
 	//! returns a const reference to the eigenvectors of this LDA

@@ -45,6 +45,17 @@ template<typename _Tp>
 vector<int> argsort_(const Mat& src, bool sortAscending=true);
 vector<int> argsort(const Mat& src, bool sortAscending=true);
 
+//! turns a vector of matrices into a row matrix
+Mat asRowMatrix(const vector<Mat>& src);
+//! turns a vector of matrices into a column matrix
+Mat asColumnMatrix(const vector<Mat>& src);
+//! turns a one-channel matrix into a grayscale representation
+Mat toGrayscale(const Mat& src);
+//! transposes a matrix
+Mat transpose(const Mat& src);
+//! matlab equivalent num2str
+string num2str(int i);
+
 template<typename _Tp, int _rows, int _cols, int _options, int _maxRows, int _maxCols>
 void eigen2cv( const Eigen::Matrix<_Tp, _rows, _cols, _options, _maxRows, _maxCols>& src, Mat& dst )
 {

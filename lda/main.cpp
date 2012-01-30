@@ -30,29 +30,21 @@
 using namespace cv;
 using namespace std;
 
-/*
- * Read image filenames and corresponding classes from a CSV file. Example CSV file:
- *	/path/to/image0.jpg;0
- *	/path/to/image1.jpg;0
- *	/path/to/image2.jpg;0
- *	/path/to/image3.jpg;1
- *	/path/to/image4.jpg;1
- *	...
- */
-void read_csv(const string& filename, vector<string>& files, vector<int>& classes) {
+void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels) {
 	std::ifstream file(filename.c_str(), ifstream::in);
-	if(file) {
-		std::string line, path, classlabel;
-		while (std::getline(file, line)) {
-			std::stringstream liness(line);
-			std::getline(liness, path, ';');
-			std::getline(liness, classlabel);
-
-			files.push_back(path);
-			classes.push_back(atoi(classlabel.c_str()));
-		}
-	} else {
-		cerr << "Error: Failed to open file.";
+	if(!file)
+		throw std::exception();
+	std::string line, path, classlabel;
+	// for each line
+	while (std::getline(file, line)) {
+		// get current line
+		std::stringstream liness(line);
+		// split line
+		std::getline(liness, path, ';');
+		std::getline(liness, classlabel);
+		// push pack the data
+		images.push_back(imread(path,0));
+		labels.push_back(atoi(classlabel.c_str()));
 	}
 }
 
@@ -93,40 +85,49 @@ int main(int argc, const char *argv[]) {
 	// hold the path to the image and corresponding class
 	vector<string> files;
 	vector<int> classes;
-	// Example of a CSV File
+	// example for reading a face database from a CSV file
 	//
 	// CSV -- https://github.com/bytefish/opencv/blob/master/lda/at.txt
 	// Database -- http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html
 	//
 	// Always make sure classes are given as {0, 1,..., n}!
-	read_csv("/path/to/your/database.txt", files, classes);
-	int numImages = files.size();
-	// get dimension from first image
-	Mat img = imread(files[0], 0);
-	int total = img.cols * img.rows;
-	// read in the data, each row is an image
-	Mat data(numImages, total, CV_32FC1);
-	for(int instanceIdx = 0; instanceIdx < files.size() - 1; instanceIdx++) {
-		Mat xi = data.row(instanceIdx);
-		Mat tmp_img;
-		imread(files[instanceIdx], 0).convertTo(tmp_img, CV_32FC1, 1/255.);
-		tmp_img.reshape(1, 1).copyTo(xi);
+	vector<Mat> images;
+	vector<int> labels;
+	// check for command line arguments
+	if(argc != 2) {
+		cout << "usage: " << argv[0] << " <csv.ext>" << endl;
+		exit(1);
 	}
-	// build the Fisherfaces model (data is in row)
-	subspace::Fisherfaces model(data, classes);
-	// test model (with last image...)
-	imread(files[numImages - 1],0).convertTo(img, CV_32FC1, 1/255.);
-	int predicted = model.predict(img.reshape(1, 1));
+	// path to your CSV
+	string fn_csv = string(argv[1]);
+	// read in the images
+	try {
+		read_csv(fn_csv, images, labels);
+	} catch(exception& e) {
+		cerr << "Error opening file \"" << fn_csv << "\"." << endl;
+		exit(1);
+	}
+	// get width and height
+	int width = images[0].cols;
+	int height = images[0].rows;
+	// get test instances
+	Mat testSample = images[images.size()-1];
+	int testLabel = labels[labels.size()-1];
+	// ... and delete last element
+	images.pop_back();
+	labels.pop_back();
+	// build the Fisherfaces model
+	subspace::Fisherfaces model(images, labels);
+	// test model
+	int predicted = model.predict(testSample);
 	cout << "predicted class = " << predicted << endl;
-	cout << "actual class = " << classes[numImages-1] << endl;
-	stringstream ss;
-	// show first 10 Fisherfaces
-	for(int i = 0; i < max(1, min(10, model.eigenvectors().cols)); i++) {
-		ss << "fisherface_" << i;
-		Mat v;
-		model.eigenvectors().col(i).copyTo(v);
-		normalize(v, v, 0, 255, NORM_MINMAX, CV_8UC1);
-		imshow(ss.str(), v.reshape(1, img.rows));
+	cout << "actual class = " << testLabel << endl;
+	// get the eigenvectors
+	Mat W = model.eigenvectors();
+	// show first 10 eigenfaces
+	for(int i = 0; i < 10; i++) {
+		Mat ev = W.col(i).clone();
+		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}
 	waitKey(0);
 	return 0;

@@ -22,31 +22,53 @@
 using namespace Eigen;
 using namespace cv;
 
+//! computes Y = (X-mean)*W
+Mat subspace::project(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow) {
+	Mat X,Y;
+	int n = dataAsRow ? src.rows : src.cols;
+	// center data
+	subtract(dataAsRow ? src : transpose(src),
+			repeat(dataAsRow ? mean : transpose(mean), n, 1),
+			X,
+			Mat(),
+			W.type());
+	// Y = (X-mean)*W
+	gemm(X, W, 1.0, Mat(), 0.0, Y);
+	return dataAsRow ? Y : transpose(Y);
+}
+
+//! X = Y*W'+mean
+Mat subspace::reconstruct(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow) {
+	Mat X;
+	// get number of samples
+	int n = dataAsRow ? src.rows : src.cols;
+	gemm(dataAsRow ? src : transpose(src),
+			W,
+			1.0,
+			repeat(dataAsRow ? mean : transpose(mean), n, 1),
+			1.0,
+			X,
+			GEMM_2_T);
+	return dataAsRow ? X : transpose(X);
+}
+
 void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<int>& labels) {
-	// assert type
-	if((src.type() != CV_32FC1) && (src.type() != CV_64FC1))
-		CV_Error(CV_StsBadArg, "src must be a valid float or double matrix");
-	// we want double precision, so convert
-	Mat data;
-	src.convertTo(data, CV_64FC1);
-	// turn into row vector samples
-	if(!_dataAsRow)
-		transpose(data,data);
-	// assert, that labels are valid 32bit signed integer values
-	if(labels.size() != data.rows)
-		CV_Error(CV_StsBadArg, "labels array must be a valid 1d integer vector of len(src) elements");
+	if(src.channels() != 1)
+		CV_Error(CV_StsBadArg, "Only single channel matrices allowed.");
+	Mat data = _dataAsRow ? src.clone() : transpose(src);
+	data.convertTo(data, CV_64FC1);
 	// get information about the data
 	int N = data.rows; // number of samples
 	int D = data.cols; // dimension of samples
 	int C = *max_element(labels.begin(), labels.end()) + 1; // number of classes
+	// assert: len(src) = len(labels)
+	if(labels.size() != N)
+		CV_Error(CV_StsBadArg, "Error: The number of samples must equal the number of labels.");
 	// warn: Within-classes scatter matrix will become singular!
 	if(N < D)
-		cout << "Less instances than feature dimension! Computation will probably fail." << endl;
+		cout << "Warning: Less observations than feature dimension given! Computation will probably fail." << endl;
 	// warn: There are atmost (C-1) non-zero eigenvalues!
-	if((_num_components > (C-1)) || (_num_components < 1)) {
-		_num_components = C-1;
-		cout << "num_components set to: " << _num_components << "!" << endl;
-	}
+	_num_components = max(1, min(_num_components, (C-1)));
 	// the mean over all classes
 	Mat meanTotal = Mat::zeros(1, D, data.type());
 	// the mean for each class
@@ -109,30 +131,14 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	_eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
 }
 
-void subspace::LinearDiscriminantAnalysis::project(const Mat& src, Mat& dst) {
-	if(_dataAsRow) {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst, CV_GEMM_A_T + CV_GEMM_B_T);
-	} else {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst,  CV_GEMM_A_T);
-	}
-}
-
-void subspace::LinearDiscriminantAnalysis::reconstruct(const Mat& src, Mat& dst) {
-	if(_dataAsRow) {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst, CV_GEMM_B_T);
-	} else {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst);
-	}
-}
-
 Mat subspace::LinearDiscriminantAnalysis::project(const Mat& src) {
 	Mat dst;
-	project(src, dst);
-	return dst;
+	gemm(_dataAsRow ? src : transpose(src), _eigenvectors, 1.0, Mat(), 0, dst);
+	return _dataAsRow ? dst : transpose(dst);
 }
 
 Mat subspace::LinearDiscriminantAnalysis::reconstruct(const Mat& src) {
 	Mat dst;
-	reconstruct(src, dst);
-	return dst;
+	gemm(_dataAsRow ? src : transpose(src), src, 1.0, Mat(), 0, dst, GEMM_2_T);
+	return _dataAsRow ? dst : transpose(dst);
 }

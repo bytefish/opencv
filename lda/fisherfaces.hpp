@@ -20,7 +20,6 @@
 #define __FISHERFACES_HPP__
 
 #include "cv.h"
-#include <eigen3/Eigen/SVD>
 
 using namespace cv;
 using namespace std;
@@ -47,6 +46,7 @@ private:
 	int _num_components;
 	Mat _eigenvectors;
 	Mat _eigenvalues;
+	Mat _mean;
 	vector<Mat> _projections;
 	vector<int> _labels;
 
@@ -56,6 +56,11 @@ public:
 		_num_components(0),
 		_dataAsRow(true) {};
 
+	Fisherfaces(const vector<Mat>& src,
+			const vector<int>& labels,
+			int num_components = 0);
+
+
 	Fisherfaces(const Mat& src,
 			const vector<int>& labels,
 			int num_components = 0,
@@ -63,30 +68,27 @@ public:
 				_num_components(num_components),
 				_dataAsRow(dataAsRow)
 	{
-		this->compute(src, labels); //! compute eigenvectors and eigenvalues
+		compute(src, labels);
 	}
 
 	~Fisherfaces() {}
 
-	// compute the discriminants for data in src and labels
+	//! compute the discriminants for data in src and labels
 	void compute(const Mat& src, const vector<int>& labels);
-
-	// project
-	void project(const Mat& src, Mat& dst);
-	Mat project(const Mat& src);
-
-	// reconstruct
-	void reconstruct(const Mat& src, Mat& dst);
-	Mat reconstruct(const Mat& src);
-
-	// returns a const reference to the eigenvectors of this LDA
-	const Mat& eigenvectors() const { return _eigenvectors; };
-
-	// returns a const reference to the eigenvalues of this LDA
-	const Mat& eigenvalues() const { return _eigenvalues; }
-
+	//! compute the discriminants for data in src and labels
+	void compute(const vector<Mat>& src, const vector<int>& labels);
 	// returns the nearest neighbor to a query
 	int predict(const Mat& src);
+	//! project samples
+	Mat project(const Mat& src);
+	//! reconstruct samples
+	Mat reconstruct(const Mat& src);
+	// returns a const reference to the eigenvectors of this LDA
+	Mat eigenvectors() const { return _eigenvectors; };
+	// returns a const reference to the eigenvalues of this LDA
+	Mat eigenvalues() const { return _eigenvalues; }
+	// returns a const reference to the eigenvalues of this LDA
+	Mat mean() const { return _eigenvalues; }
 };
 }
 #endif

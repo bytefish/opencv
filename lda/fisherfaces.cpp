@@ -19,21 +19,27 @@
 #include "fisherfaces.hpp"
 #include "cv.h"
 #include "subspace.hpp"
+#include "helper.hpp"
 #include <limits>
 #include <cmath>
 #include <eigen3/Eigen/Dense>
 
+subspace::Fisherfaces::Fisherfaces(
+		const vector<Mat>& src,
+		const vector<int>& labels,
+		int num_components) {
+	_num_components = num_components;
+	_dataAsRow = true;
+	compute(asRowMatrix(src), labels);
+}
+
 void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {
-	// assert type
-	if((src.type() != CV_32FC1) && (src.type() != CV_64FC1))
-		CV_Error(CV_StsBadArg, "src must be a valid matrix float or double matrix");
-	Mat data;
-	src.convertTo(data, CV_64FC1);
-	// turn into row vector samples
-	if(!_dataAsRow)
-		transpose(data,data);
+	if(src.channels() != 1)
+		CV_Error(CV_StsBadArg, "Only single channel matrices allowed.");
+	Mat data = _dataAsRow ? src.clone() : transpose(src);
+	data.convertTo(data, CV_64FC1);
 	if(labels.size() != data.rows)
-		CV_Error(CV_StsBadArg, "labels array must be a valid 1d integer vector of len(src) elements");
+		CV_Error(CV_StsBadArg, "The number of samples must equal the number of labels.");
 	// store labels
 	_labels = labels;
 	// compute the Fisherfaces
@@ -44,59 +50,37 @@ void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {
 	PCA pca(data, Mat(), CV_PCA_DATA_AS_ROW, (N-C));
 	// project the data and perform a LDA on it
 	LinearDiscriminantAnalysis lda(pca.project(data),labels, C-1);
+	// store the sample data mean
+	_mean = pca.mean.clone();
 	// store the eigenvalues of the discriminants
 	lda.eigenvalues().copyTo(_eigenvalues);
 	// calculate the projection matrix as pca.eigenvectors * lda.eigenvectors
 	gemm(pca.eigenvectors, lda.eigenvectors(), 1.0, Mat(), 0.0, _eigenvectors, CV_GEMM_A_T);
 	// store the projections of the original data
 	for(int sampleIdx = 0; sampleIdx < data.rows; sampleIdx++)
-		_projections.push_back(project(data.row(sampleIdx)));
+		_projections.push_back(project(_dataAsRow ? src.row(sampleIdx) : src.col(sampleIdx)));
 }
 
-void subspace::Fisherfaces::project(const Mat& src, Mat& dst) {
-	if(_dataAsRow) {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst, CV_GEMM_A_T + CV_GEMM_B_T);
-	} else {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst,  CV_GEMM_A_T);
-	}
+Mat subspace::Fisherfaces::project(const Mat& src) {
+	return subspace::project(_eigenvectors, _mean, src, _dataAsRow);
 }
 
-void subspace::Fisherfaces::reconstruct(const Mat& src, Mat& dst) {
-	if(_dataAsRow) {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst, CV_GEMM_B_T);
-	} else {
-		gemm(_eigenvectors, src, 1.0, Mat(), 0, dst);
-	}
+Mat subspace::Fisherfaces::reconstruct(const Mat& src) {
+	return subspace::reconstruct(_eigenvectors, _mean, src, _dataAsRow);
 }
 
 int subspace::Fisherfaces::predict(const Mat& src) {
-	Mat query;
-	src.convertTo(query, CV_64FC1);
-	query = query.reshape(1,1);
-	Mat projection = this->project(query);
-	if(!_dataAsRow)
-		transpose(query,query);
+	Mat q = project(_dataAsRow ? src.reshape(1,1) : src.reshape(1, src.total()));
+	// find 1-nearest neighbor
 	double minDist = numeric_limits<double>::max();
 	int minClass = -1;
 	for(int sampleIdx = 0; sampleIdx < _projections.size(); sampleIdx++) {
-		double dist = norm(_projections[sampleIdx], projection, NORM_L2);
+		double dist = norm(_projections[sampleIdx], q, NORM_L2);
 		if(dist < minDist) {
 			minDist = dist;
 			minClass = _labels[sampleIdx];
 		}
 	}
 	return minClass;
-}
-
-Mat subspace::Fisherfaces::project(const Mat& src) {
-	Mat dst;
-	project(src, dst);
-	return dst;
-}
-
-Mat subspace::Fisherfaces::reconstruct(const Mat& src) {
-	Mat dst;
-	reconstruct(src, dst);
-	return dst;
 }
 

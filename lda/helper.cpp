@@ -40,6 +40,7 @@ public:
 
 
 void cv::sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices) {
+	dst.create(src.rows, src.cols, src.type());
 	for(int idx = 0; idx < sorted_indices.size(); idx++) {
 		Mat originalCol = src.col(sorted_indices[idx]);
 		Mat sortedCol = dst.col(idx);
@@ -48,12 +49,13 @@ void cv::sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices
 }
 
 Mat cv::sortMatrixByColumn(const Mat& src, vector<int> sorted_indices) {
-	Mat dst = src.clone();
+	Mat dst;
 	sortMatrixByColumn(src, dst, sorted_indices);
 	return dst;
 }
 
 void cv::sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices) {
+	dst.create(src.rows, src.cols, src.type());
 	for(int idx = 0; idx < sorted_indices.size(); idx++) {
 		Mat originalRow = src.row(sorted_indices[idx]);
 		Mat sortedRow = dst.row(idx);
@@ -62,7 +64,7 @@ void cv::sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices) {
 }
 
 Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
-	Mat dst = src.clone();
+	Mat dst;
 	sortMatrixByRow(src, dst, sorted_indices);
 	return dst;
 }
@@ -100,4 +102,48 @@ vector<int> cv::argsort(const Mat& src, bool asc) {
 		case CV_32FC1: return argsort_<float>(src,asc); break;
 		case CV_64FC1: return argsort_<double>(src,asc); break;
 	}
+}
+
+Mat cv::asColumnMatrix(const vector<Mat>& src) {
+	int n = src.size();
+	int d = src[0].total();
+	Mat data(d, n, CV_32FC1);
+	for(int i = 0; i < src.size(); i++) {
+		Mat tmp,
+			xi = data.col(i);
+		src[i].convertTo(tmp, CV_32FC1);
+		tmp.reshape(1, d).copyTo(xi);
+	}
+	return data;
+}
+
+Mat cv::asRowMatrix(const vector<Mat>& src) {
+	int n = src.size();
+	int d = src[0].total();
+	Mat data(n, d, CV_32FC1);
+	for(int i = 0; i < src.size(); i++) {
+		Mat tmp,
+			xi = data.row(i);
+		src[i].convertTo(tmp, CV_32FC1);
+		tmp.reshape(1, 1).copyTo(xi);
+	}
+	return data;
+}
+
+Mat cv::transpose(const Mat& src) {
+		Mat dst;
+		transpose(src, dst);
+		return dst;
+}
+
+Mat cv::toGrayscale(const Mat& src) {
+	Mat dst;
+	cv::normalize(src, dst, 0, 255, NORM_MINMAX, CV_8UC1);
+	return dst;
+}
+
+string cv::num2str(int i) {
+	stringstream ss;
+	ss << i;
+	return ss.str();
 }
