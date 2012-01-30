@@ -4,12 +4,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <deque>
 #include <string>
 
-#include <cmath>
-#include <limits>
-#include <iterator>
 
 #include "helper.hpp"
 #include "eigenfaces.hpp"
@@ -19,29 +15,40 @@ using namespace cv;
 
 void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels) {
 	std::ifstream file(filename.c_str(), ifstream::in);
-	if(file) {
-		std::string line, path, classlabel;
-		// for each line
-		while (std::getline(file, line)) {
-			// get current line
-			std::stringstream liness(line);
-			// split line
-			std::getline(liness, path, ';');
-			std::getline(liness, classlabel);
-			// push pack the data
-			images.push_back(imread(path,0));
-			labels.push_back(atoi(classlabel.c_str()));
-		}
-	} else {
-		cerr << "Error: Failed to open file.";
+	if(!file)
+		throw std::exception();
+	std::string line, path, classlabel;
+	// for each line
+	while (std::getline(file, line)) {
+		// get current line
+		std::stringstream liness(line);
+		// split line
+		std::getline(liness, path, ';');
+		std::getline(liness, classlabel);
+		// push pack the data
+		images.push_back(imread(path,0));
+		labels.push_back(atoi(classlabel.c_str()));
 	}
 }
 
 int main(int argc, char *argv[]) {
 	vector<Mat> images;
 	vector<int> labels;
-	// read images
-	read_csv("./at.txt", images, labels);
+	// check for command line arguments
+	if(argc != 2) {
+		cout << "usage: " << argv[0] << " <csv.ext>" << endl;
+		exit(1);
+	}
+
+	// path to your CSV
+	string fn_csv = string(argv[1]);
+	// read in the images
+	try {
+		read_csv(fn_csv, images, labels);
+	} catch(exception& e) {
+		cerr << "Error opening file \"" << fn_csv << "\"." << endl;
+		exit(1);
+	}
 	// get width and height
 	int width = images[0].cols;
 	int height = images[0].rows;
@@ -71,4 +78,5 @@ int main(int argc, char *argv[]) {
 		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}
 	waitKey(0);
+	return 0;
 }
