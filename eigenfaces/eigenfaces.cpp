@@ -37,7 +37,7 @@ void Eigenfaces::compute(const Mat& src, const vector<int>& labels) {
 	_labels = vector<int>(labels); // store labels for projections
 	// projections
 	for(int sampleIdx = 0; sampleIdx < data.rows; sampleIdx++) {
-		this->_projections.push_back(project(data.row(sampleIdx)));
+		this->_projections.push_back(project(_dataAsRow ? src.row(sampleIdx) : src.col(sampleIdx)));
 	}
 }
 
@@ -62,9 +62,10 @@ int Eigenfaces::predict(const Mat& src) {
 
 Mat Eigenfaces::project(const Mat& src) {
 	Mat X,Y;
+	int n = _dataAsRow ? src.rows : src.cols;
 	// center data
 	subtract(_dataAsRow ? src : transpose(src),
-			repeat(_mean, src.rows, 1),
+			repeat(_mean, n, 1),
 			X,
 			Mat(),
 			_eigenvectors.type());
@@ -75,11 +76,12 @@ Mat Eigenfaces::project(const Mat& src) {
 
 Mat Eigenfaces::reconstruct(const Mat& src) {
 	Mat X;
+	int n = _dataAsRow ? src.rows : src.cols;
 	// X = Y*W'+mean
 	gemm(_dataAsRow ? src : transpose(src),
 			_eigenvectors,
 			1.0,
-			repeat(_mean, src.rows, 1),
+			repeat(_mean, n, 1),
 			1.0,
 			X,
 			GEMM_2_T);

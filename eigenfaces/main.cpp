@@ -77,7 +77,6 @@ int main(int argc, char *argv[]) {
 		Mat ev = W.col(i).clone();
 		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}
-	// wait forever
 	waitKey(0);
 	return 0;
 }
