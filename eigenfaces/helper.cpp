@@ -43,6 +43,7 @@ public:
 
 
 void cv::sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices) {
+	dst.create(src.rows, src.cols, src.type());
 	for(int idx = 0; idx < sorted_indices.size(); idx++) {
 		Mat originalCol = src.col(sorted_indices[idx]);
 		Mat sortedCol = dst.col(idx);
@@ -51,12 +52,13 @@ void cv::sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices
 }
 
 Mat cv::sortMatrixByColumn(const Mat& src, vector<int> sorted_indices) {
-	Mat dst = src.clone();
+	Mat dst;
 	sortMatrixByColumn(src, dst, sorted_indices);
 	return dst;
 }
 
 void cv::sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices) {
+	dst.create(src.rows, src.cols, src.type());
 	for(int idx = 0; idx < sorted_indices.size(); idx++) {
 		Mat originalRow = src.row(sorted_indices[idx]);
 		Mat sortedRow = dst.row(idx);
@@ -65,7 +67,7 @@ void cv::sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices) {
 }
 
 Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
-	Mat dst = src.clone();
+	Mat dst;
 	sortMatrixByRow(src, dst, sorted_indices);
 	return dst;
 }
@@ -148,6 +150,5 @@ string cv::num2str(int i) {
 	ss << i;
 	return ss.str();
 }
-
 
 #endif /* HELPER_CPP_ */
