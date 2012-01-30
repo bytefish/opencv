@@ -29,36 +29,35 @@ using namespace std;
 
 namespace cv
 {
-// matlab equivalent num2str
+//! matlab equivalent num2str
 string num2str(int i);
-// templated sort operator
+//! templated sort operator
 template<typename _Tp>
 class SortByFirstAscending_;
-// descending sort operator
+//! descending sort operator
 template<typename _Tp>
 class SortByFirstDescending_;
-// sorts a matrix by column for given indices
+//! sorts a matrix by column for given indices
 void sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices);
-// sorts a matrix by column for given indices
+//! sorts a matrix by column for given indices
 Mat sortMatrixByColumn(const Mat& src, vector<int> sorted_indices);
-// sorts a matrix by row for given indices
+//! sorts a matrix by row for given indices
 void sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices);
-// sorts a matrix by row for given indices
+//! sorts a matrix by row for given indices
 Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
-// turns a vector of matrices into a row matrix
+//! turns a vector of matrices into a row matrix
 Mat asRowMatrix(const vector<Mat>& src);
-// turns a vector of matrices into a column matrix
+//! turns a vector of matrices into a column matrix
 Mat asColumnMatrix(const vector<Mat>& src);
-// turns a one-channel matrix into a grayscale representation
+//! turns a one-channel matrix into a grayscale representation
 Mat toGrayscale(const Mat& src);
-// transposes a matrix
+//! transposes a matrix
 Mat transpose(const Mat& src);
-// performs a matlab/numpy equivalent argsort (only 1 channel matrices supported)
+//! performs a matlab/numpy equivalent argsort (only 1 channel matrices supported)
 template<typename _Tp>
 vector<int> argsort_(const Mat& src, bool sortAscending=true);
-// performs a matlab/numpy equivalent argsort (only 1 channel matrices supported)
+//! performs a matlab/numpy equivalent argsort (only 1 channel matrices supported)
 vector<int> argsort(const Mat& src, bool sortAscending=true);
-
 }
 
 #endif
