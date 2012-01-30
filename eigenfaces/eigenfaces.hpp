@@ -45,7 +45,7 @@ public:
 		_num_components(num_components),
 		_dataAsRow(dataAsRow) {};
 	//! compute num_component eigenfaces for given images in src and corresponding classes in labels
-	Eigenfaces(const vector<Mat>& src, const vector<int>& labels, int num_components = 0);
+	Eigenfaces(const vector<Mat>& src, const vector<int>& labels, int num_components = 0, bool dataAsRow = true);
 	//! compute num_component eigenfaces for given images in src and corresponding classes in labels
 	//    default is observation by row, pass dataAsRow = false if observations are given by column
 	Eigenfaces(const Mat& src, const vector<int>& labels, int num_components = 0, bool dataAsRow = true);

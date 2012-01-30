@@ -4,13 +4,15 @@
 Eigenfaces::Eigenfaces(const Mat& src, const vector<int>& labels, int num_components, bool dataAsRow) {
 	_num_components = num_components;
 	_dataAsRow = dataAsRow;
+	// compute the eigenfaces
 	compute(src, labels);
 }
 
-Eigenfaces::Eigenfaces(const vector<Mat>& src, const vector<int>& labels, int num_components) {
+Eigenfaces::Eigenfaces(const vector<Mat>& src, const vector<int>& labels, int num_components, bool dataAsRow) {
 	_num_components = num_components;
-	_dataAsRow = true;
-	compute(asRowMatrix(src), labels);
+	_dataAsRow = dataAsRow;
+	// compute the eigenfaces
+	compute(src, labels);
 }
 
 void Eigenfaces::compute(const Mat& src, const vector<int>& labels) {
@@ -42,7 +44,7 @@ void Eigenfaces::compute(const Mat& src, const vector<int>& labels) {
 }
 
 void Eigenfaces::compute(const vector<Mat>& src, const vector<int>& labels) {
-	compute(asRowMatrix(src), labels);
+	compute(_dataAsRow ? asRowMatrix(src) : asColumnMatrix(src), labels);
 }
 
 int Eigenfaces::predict(const Mat& src) {
