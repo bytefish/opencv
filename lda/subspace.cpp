@@ -16,6 +16,7 @@
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
 #include <eigen3/Eigen/Dense>
+#include <map>
 #include "subspace.hpp"
 #include "helper.hpp"
 
@@ -56,22 +57,32 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	if(src.channels() != 1)
 		CV_Error(CV_StsBadArg, "Only single channel matrices allowed.");
 	Mat data = _dataAsRow ? src.clone() : transpose(src);
+	// since we are dealing with very small numbers, use double values
 	data.convertTo(data, CV_64FC1);
-	// get information about the data
-	int N = data.rows; // number of samples
-	int D = data.cols; // dimension of samples
-	int C = *max_element(labels.begin(), labels.end()) + 1; // number of classes
-	// assert: len(src) = len(labels)
+	// maps the labels, so they have an ascending identifier from 0:C
+	vector<int> mapped_labels(labels.size());
+	vector<int> num2label = cv::vec_unqiue(labels);
+	map<int,int> label2num;
+	for(int i=0;i<num2label.size();i++)
+		label2num[num2label[i]] = i;
+	for(int i=0;i<labels.size();i++)
+		mapped_labels[i] = label2num[labels[i]];
+	// get sample size, dimension
+	int N = data.rows;
+	int D = data.cols;
+	// get number of classes (number of unique labels)
+	int C = num2label.size();
+	// assert, that: len(src) = len(labels)
 	if(labels.size() != N)
 		CV_Error(CV_StsBadArg, "Error: The number of samples must equal the number of labels.");
-	// warn: Within-classes scatter matrix will become singular!
+	// warn if within-classes scatter matrix becomes singular
 	if(N < D)
 		cout << "Warning: Less observations than feature dimension given! Computation will probably fail." << endl;
-	// warn: There are atmost (C-1) non-zero eigenvalues!
+	// clip number of components to be a valid number
 	_num_components = max(1, min(_num_components, (C-1)));
-	// the mean over all classes
+	// holds the mean over all classes
 	Mat meanTotal = Mat::zeros(1, D, data.type());
-	// the mean for each class
+	// holds the mean for each class
 	Mat meanClass[C];
 	int numClass[C];
 	// initialize
@@ -82,7 +93,7 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	// calculate sums
 	for (int i = 0; i < N; i++) {
 		Mat instance = data.row(i);
-		int classIdx = labels[i];
+		int classIdx = mapped_labels[i];
 		add(meanTotal, instance, meanTotal);
 		add(meanClass[classIdx], instance, meanClass[classIdx]);
 		numClass[classIdx]++;
@@ -93,7 +104,7 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 		meanClass[i].convertTo(meanClass[i], meanClass[i].type(), 1.0/static_cast<double>(numClass[i]));
 	// subtract class means
 	for (int i = 0; i < N; i++) {
-		int classIdx = labels[i];
+		int classIdx = mapped_labels[i];
 		Mat instance = data.row(i);
 		subtract(instance, meanClass[classIdx], instance);
 	}

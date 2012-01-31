@@ -27,17 +27,10 @@ using namespace std;
 namespace subspace {
 
 /**
- * Fisherfaces
- *
- * Implements the Fisherfaces method as described in:
- *
- *  * P. Belhumeur, J. Hespanha, and D. Kriegman,
- *    "Eigenfaces vs. Fisherfaces: Recognition Using Class Specific Linear Projection",
- *    IEEE Transactions on Pattern Analysis and Machine Intelligence,
- *    19(7):711--720,
- *    1997.
- *
- * TODO Use OpenCVs KNearestNeighbor class
+ * P. Belhumeur, J. Hespanha, and D. Kriegman,
+ * "Eigenfaces vs. Fisherfaces: Recognition Using Class Specific Linear Projection",
+ * IEEE Transactions on Pattern Analysis and Machine Intelligence,
+ * 19(7):711--720, 1997.
  */
 class Fisherfaces {
 

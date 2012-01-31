@@ -46,25 +46,27 @@ void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {
 	data.convertTo(data, CV_64FC1);
 	if(labels.size() != data.rows)
 		CV_Error(CV_StsBadArg, "The number of samples must equal the number of labels.");
-	// store labels
-	_labels = labels;
 	// compute the Fisherfaces
 	int N = data.rows; // number of samples
 	int D = data.cols; // dimension of samples
-	int C = *max_element(labels.begin(), labels.end()) + 1; // number of classes
+	int C = vec_unqiue(labels).size(); // number of unique classes
 	// perform a PCA and keep (N-C) components
 	PCA pca(data, Mat(), CV_PCA_DATA_AS_ROW, (N-C));
 	// project the data and perform a LDA on it
 	LinearDiscriminantAnalysis lda(pca.project(data),labels, C-1);
-	// store the sample data mean
-	_mean = pca.mean.clone();
+	// store the total mean vector
+	_mean = _dataAsRow ? pca.mean.reshape(1,1) : pca.mean.reshape(1, pca.mean.total());
+	// store labels
+	_labels = labels;
 	// store the eigenvalues of the discriminants
 	lda.eigenvalues().copyTo(_eigenvalues);
-	// calculate the projection matrix as pca.eigenvectors * lda.eigenvectors
+	// Now calculate the projection matrix as pca.eigenvectors * lda.eigenvectors.
+	// Note: OpenCV stores the eigenvectors by row, so we need to transpose it!
 	gemm(pca.eigenvectors, lda.eigenvectors(), 1.0, Mat(), 0.0, _eigenvectors, CV_GEMM_A_T);
 	// store the projections of the original data
 	for(int sampleIdx = 0; sampleIdx < data.rows; sampleIdx++)
 		_projections.push_back(project(_dataAsRow ? src.row(sampleIdx) : src.col(sampleIdx)));
+
 }
 
 Mat subspace::Fisherfaces::project(const Mat& src) {
@@ -89,4 +91,3 @@ int subspace::Fisherfaces::predict(const Mat& src) {
 	}
 	return minClass;
 }
-

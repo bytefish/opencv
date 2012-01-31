@@ -69,6 +69,29 @@ Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
 	return dst;
 }
 
+template<typename _Tp>
+vector<int> cv::argsort(const vector<_Tp>& src, bool sortAscending) {
+	// store values and index
+	vector< pair<_Tp,int> > val_indices;
+	for(int i=0; i<src.size(); i++)
+		val_indices.push_back(make_pair(src[i], i));
+	// sort ascending or descending
+	if(sortAscending) {
+		std::sort(val_indices.begin(), val_indices.end(), SortByFirstAscending_<_Tp>());
+	} else {
+		std::sort(val_indices.begin(), val_indices.end(), SortByFirstDescending_<_Tp>());
+	}
+	// only return indices
+	vector<int> indices;
+	for(int i=0; i < val_indices.size(); i++)
+		indices.push_back(val_indices[i].second);
+	return indices;
+}
+
+vector<int> cv::vec_unqiue(vector<int> src) {
+	src.erase(unique(src.begin(),src.end()), src.end());
+	return src;
+}
 
 template<typename _Tp>
 vector<int> cv::argsort_(const Mat& src, bool asc=true) {
