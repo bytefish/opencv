@@ -33,10 +33,7 @@ Mat reconstruct(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow = 
 using namespace cv;
 using namespace std;
 
-/**
- * \class LinearDiscriminantAnalysis
- * \brief Performs a Multiclass Discriminant Analysis.
- */
+//! Performs a Linear Discriminant Analysis
 class LinearDiscriminantAnalysis {
 
 private:
@@ -47,14 +44,16 @@ private:
 
 public:
 
+	//! initialize with 0 components and data given in rows
 	LinearDiscriminantAnalysis() :
 		_num_components(0),
 		_dataAsRow(true) {};
 
+	//! initialize with num_components and specify how observations are given
 	LinearDiscriminantAnalysis(int num_components, bool dataAsRow = true) :
 		_num_components(num_components),
 		_dataAsRow(dataAsRow) {};
-
+	//! initialize and perform a discriminant analysis with given data in src and labels
 	LinearDiscriminantAnalysis(const Mat& src,
 			const vector<int>& labels,
 			int num_components = 0,
@@ -64,21 +63,28 @@ public:
 	{
 		this->compute(src, labels); //! compute eigenvectors and eigenvalues
 	}
-
+	//! initialize and perform a discriminant analysis with given data in src and labels
+	LinearDiscriminantAnalysis(const vector<Mat>& src,
+			const vector<int>& labels,
+			int num_components = 0,
+			bool dataAsRow = true) :
+				_num_components(num_components),
+				_dataAsRow(dataAsRow)
+	{
+		this->compute(src, labels); //! compute eigenvectors and eigenvalues
+	}
+	//! destructor
 	~LinearDiscriminantAnalysis() {}
-
 	//! compute the discriminants for data in src and labels
 	void compute(const Mat& src, const vector<int>& labels);
-
+	//! compute the discriminants for data in src and labels
+	void compute(const vector<Mat>& src, const vector<int>& labels);
 	//! project
 	Mat project(const Mat& src);
-
 	//! reconstruct
 	Mat reconstruct(const Mat& src);
-
 	//! returns a const reference to the eigenvectors of this LDA
 	const Mat& eigenvectors() const { return _eigenvectors; };
-
 	//! returns a const reference to the eigenvalues of this LDA
 	const Mat& eigenvalues() const { return _eigenvalues; }
 };

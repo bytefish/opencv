@@ -142,6 +142,10 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	_eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
 }
 
+void subspace::LinearDiscriminantAnalysis::compute(const vector<Mat>& src, const vector<int>& labels) {
+	compute(_dataAsRow? asRowMatrix(src) : asColumnMatrix(src), labels);
+}
+
 Mat subspace::LinearDiscriminantAnalysis::project(const Mat& src) {
 	Mat dst;
 	gemm(_dataAsRow ? src : transpose(src), _eigenvectors, 1.0, Mat(), 0, dst);
