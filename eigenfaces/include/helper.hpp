@@ -53,11 +53,6 @@ Mat asColumnMatrix(const vector<Mat>& src, int type = CV_32FC1);
 Mat toGrayscale(const Mat& src);
 //! transposes a matrix
 Mat transpose(const Mat& src);
-//! performs a matlab/numpy equivalent argsort (only 1 channel matrices supported)
-template<typename _Tp>
-vector<int> argsort_(const Mat& src, bool sortAscending=true);
-//! performs a matlab/numpy equivalent argsort (only 1 channel matrices supported)
-vector<int> argsort(const Mat& src, bool sortAscending=true);
 }
 
 #endif
