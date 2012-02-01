@@ -46,9 +46,9 @@ void sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices);
 //! sorts a matrix by row for given indices
 Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
 //! turns a vector of matrices into a row matrix
-Mat asRowMatrix(const vector<Mat>& src);
+Mat asRowMatrix(const vector<Mat>& src, int type = CV_32FC1);
 //! turns a vector of matrices into a column matrix
-Mat asColumnMatrix(const vector<Mat>& src);
+Mat asColumnMatrix(const vector<Mat>& src, int type = CV_32FC1);
 //! turns a one-channel matrix into a grayscale representation
 Mat toGrayscale(const Mat& src);
 //! transposes a matrix

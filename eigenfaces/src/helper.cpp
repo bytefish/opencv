@@ -74,7 +74,7 @@ Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
 
 
 template<typename _Tp>
-vector<int> cv::argsort_(const Mat& src, bool asc=true) {
+vector<int> cv::argsort_(const Mat& src, bool asc) {
 	if(src.rows != 1 && src.cols != 1)
 		CV_Error(CV_StsBadArg, "Argsort only sorts 1D Vectors");
 	// <value>,<index>
@@ -107,27 +107,27 @@ vector<int> cv::argsort(const Mat& src, bool asc) {
 	}
 }
 
-Mat cv::asColumnMatrix(const vector<Mat>& src) {
+Mat cv::asColumnMatrix(const vector<Mat>& src, int type) {
 	int n = src.size();
 	int d = src[0].total();
-	Mat data(d, n, CV_32FC1);
+	Mat data(d, n, type);
 	for(int i = 0; i < src.size(); i++) {
 		Mat tmp,
 			xi = data.col(i);
-		src[i].convertTo(tmp, CV_32FC1);
+		src[i].convertTo(tmp, type);
 		tmp.reshape(1, d).copyTo(xi);
 	}
 	return data;
 }
 
-Mat cv::asRowMatrix(const vector<Mat>& src) {
+Mat cv::asRowMatrix(const vector<Mat>& src, int type) {
 	int n = src.size();
 	int d = src[0].total();
-	Mat data(n, d, CV_32FC1);
+	Mat data(n, d, type);
 	for(int i = 0; i < src.size(); i++) {
 		Mat tmp,
 			xi = data.row(i);
-		src[i].convertTo(tmp, CV_32FC1);
+		src[i].convertTo(tmp, type);
 		tmp.reshape(1, 1).copyTo(xi);
 	}
 	return data;

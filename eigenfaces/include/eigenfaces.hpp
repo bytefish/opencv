@@ -45,10 +45,16 @@ public:
 		_num_components(num_components),
 		_dataAsRow(dataAsRow) {};
 	//! compute num_component eigenfaces for given images in src and corresponding classes in labels
-	Eigenfaces(const vector<Mat>& src, const vector<int>& labels, int num_components = 0, bool dataAsRow = true);
+	Eigenfaces(const vector<Mat>& src,
+			const vector<int>& labels,
+			int num_components = 0,
+			bool dataAsRow = true);
 	//! compute num_component eigenfaces for given images in src and corresponding classes in labels
 	//    default is observation by row, pass dataAsRow = false if observations are given by column
-	Eigenfaces(const Mat& src, const vector<int>& labels, int num_components = 0, bool dataAsRow = true);
+	Eigenfaces(const Mat& src,
+			const vector<int>& labels,
+			int num_components = 0,
+			bool dataAsRow = true);
 	//! computes a PCA for given data
 	void compute(const vector<Mat>& src, const vector<int>& labels);
 	//! computes a PCA for given data
@@ -60,11 +66,11 @@ public:
 	//! reconstructs a sample
 	Mat reconstruct(const Mat& src);
 	//! returns the eigenvectors of this PCA
-	Mat eigenvectors() { return _eigenvectors; }
+	Mat eigenvectors() const { return _eigenvectors; }
 	//! returns the eigenvalues of this PCA
-	Mat eigenvalues() { return _eigenvalues; }
+	Mat eigenvalues() const { return _eigenvalues; }
 	//! returns the mean of this PCA
-	Mat mean() { return _mean; }
+	Mat mean() const { return _mean; }
 };
 
 #endif /* EIGENFACES_H_ */
