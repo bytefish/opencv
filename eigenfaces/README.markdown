@@ -5,7 +5,7 @@ This project implements the Eigenfaces method as described in: Turk and Pentland
 
 ## Building the Project ##
 
-This project now comes with the [Eigen3](http://eigen.tuxfamily.org) headers, so compiling the project is as easy as writing (assuming you are in this folder):
+This project comes as a [CMake project](http://www.cmake.org), so compiling the project is as easy as writing (assuming you are in this folder):
 
 ```
 philipp@mango:~/some/dir/eigenfaces$ mkdir build
