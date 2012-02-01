@@ -45,9 +45,6 @@ template<typename _Tp>
 vector<int> argsort_(const Mat& src, bool sortAscending=true);
 vector<int> argsort(const Mat& src, bool sortAscending=true);
 
-template<typename _Tp>
-vector<int> argsort(const vector<_Tp>& src, bool sortAscending=true);
-
 vector<int> vec_unqiue(vector<int> src);
 
 //! turns a vector of matrices into a row matrix

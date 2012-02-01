@@ -83,10 +83,10 @@ public:
 	Mat project(const Mat& src);
 	//! reconstruct
 	Mat reconstruct(const Mat& src);
-	//! returns a const reference to the eigenvectors of this LDA
-	const Mat& eigenvectors() const { return _eigenvectors; };
-	//! returns a const reference to the eigenvalues of this LDA
-	const Mat& eigenvalues() const { return _eigenvalues; }
+	//! returns the eigenvectors of this LDA
+	Mat eigenvectors() const { return _eigenvectors; };
+	//! returns the eigenvalues of this LDA
+	Mat eigenvalues() const { return _eigenvalues; }
 };
 
 } // namespace

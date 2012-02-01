@@ -50,7 +50,8 @@ void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels) 
 
 
 int main(int argc, const char *argv[]) {
-	// example taken from: http://www.bytefish.de/wiki/pca_lda_with_gnu_octave
+	// Example for a Linear Discriminant Analysis
+	// (example taken from: http://www.bytefish.de/wiki/pca_lda_with_gnu_octave)
 	double d[11][2] = {
 			{2, 3},
 			{3, 4},
@@ -69,22 +70,32 @@ int main(int argc, const char *argv[]) {
 	vector<int> _classes(c, c + sizeof(c) / sizeof(int));
 	// perform the lda
 	subspace::LinearDiscriminantAnalysis lda(_data, _classes);
-	// GNU Octave finds the following eigenvalues
+	// GNU Octave finds the following Eigenvalue:
 	//octave> d
 	//d =
 	//	 1.5195e+00
-	//   6.5052e-18
+	//
+	// Eigen finds the following Eigenvalue:
+	// [1.519536390756363]
+	//
+	// Since there's only 1 discriminant, this is correct.
 	cout << "Eigenvalues:" << endl << lda.eigenvalues() << endl;
-	// Eigen outputs:
-	// [1.519536390756363; 9.980626757982641e-19]
+	// GNU Octave finds the following Eigenvectors:
+	//	octave:13> V(:,1)
+	//	V =
+	//
+	//	   0.71169  -0.96623
+	//	  -0.70249  -0.25766
+	//
+	// Eigen finds the following Eigenvector:
+	// [0.7116932742510111;
+	//  -0.702490343980524 ]
+	//
 	cout << "Eigenvectors:" << endl << lda.eigenvectors() << endl;
 	// project a data sample onto the subspace identified by LDA
 	Mat x = _data.row(0);
 	cout << "Projection of " << x << ": " << endl;
 	cout << lda.project(x) << endl;
-	// hold the path to the image and corresponding class
-	vector<string> files;
-	vector<int> classes;
 	// example for reading a face database from a CSV file
 	//
 	// CSV -- https://github.com/bytefish/opencv/blob/master/lda/at.txt
@@ -124,7 +135,7 @@ int main(int argc, const char *argv[]) {
 	cout << "actual class = " << testLabel << endl;
 	// get the eigenvectors
 	Mat W = model.eigenvectors();
-	// show first 10 eigenfaces
+	// show first 10 fisherfaces
 	for(int i = 0; i < 10; i++) {
 		Mat ev = W.col(i).clone();
 		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));

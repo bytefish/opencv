@@ -15,7 +15,7 @@
  *
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
-#include <eigen3/Eigen/Dense>
+#include "eigen3/Eigen/Dense"
 #include <map>
 #include "subspace.hpp"
 #include "helper.hpp"
