@@ -50,10 +50,13 @@ void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {
 	int N = data.rows; // number of samples
 	int D = data.cols; // dimension of samples
 	int C = vec_unqiue(labels).size(); // number of unique classes
+	// clip number of components to be a valid number
+	if((_num_components <= 0) || (_num_components > (C-1)))
+		_num_components = (C-1);
 	// perform a PCA and keep (N-C) components
 	PCA pca(data, Mat(), CV_PCA_DATA_AS_ROW, (N-C));
 	// project the data and perform a LDA on it
-	LinearDiscriminantAnalysis lda(pca.project(data),labels, C-1);
+	LinearDiscriminantAnalysis lda(pca.project(data),labels, _num_components);
 	// store the total mean vector
 	_mean = _dataAsRow ? pca.mean.reshape(1,1) : pca.mean.reshape(1, pca.mean.total());
 	// store labels

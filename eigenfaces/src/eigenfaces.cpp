@@ -26,7 +26,8 @@ void Eigenfaces::compute(const Mat& src, const vector<int>& labels) {
 	if(n != labels.size())
 		CV_Error(CV_StsBadArg, "The number of samples must equal the number of labels!");
 	// clip number of components to be valid
-	_num_components = max(1, min(_num_components, n));
+	if((_num_components <= 0) || (_num_components > n))
+		_num_components = n;
 	// perform the PCA
 	PCA pca(data,
 			Mat(),

@@ -79,7 +79,8 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	if(N < D)
 		cout << "Warning: Less observations than feature dimension given! Computation will probably fail." << endl;
 	// clip number of components to be a valid number
-	_num_components = max(1, min(_num_components, (C-1)));
+	if((_num_components <= 0) || (_num_components > (C-1)))
+		_num_components = (C-1);
 	// holds the mean over all classes
 	Mat meanTotal = Mat::zeros(1, D, data.type());
 	// holds the mean for each class
