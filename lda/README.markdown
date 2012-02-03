@@ -19,7 +19,7 @@ And if you are in Windows using [MinGW](http://www.mingw.org) it may look like t
 ```
 C:\some\dir\lda> mkdir build
 C:\some\dir\lda> cd build
-C:\some\dir\lda\build> cmake -G " MinGW Makefiles " ..
+C:\some\dir\lda\build> cmake -G "MinGW Makefiles" ..
 C:\some\dir\lda\build> mingw32-make
 C:\some\dir\lda\build> lda.exe filename.ext
 ```
@@ -35,7 +35,7 @@ In the example I use a CSV file to read in the data, it's the easiest solution I
 Think of the _label_ as the subject (the person) this image belongs to, so same subjects (persons) should have the same _label_. An example CSV file for the [AT&T Facedatabase](http://www.cl.cam.ac.uk/research/dtg/attarchive/facedatabase.html) is [given here](https://github.com/bytefish/opencv/blob/master/eigenfaces/at.txt), which looks like this (assuming I've extracted the database to `/home/philipp/facerec/data/at`, file is without `...` of course):
 
 ```
-/home/philipp/facerec/data/at/s1/1.pgm ;0
+/home/philipp/facerec/data/at/s1/1.pgm;0
 /home/philipp/facerec/data/at/s1/2.pgm;0
 ...
 /home/philipp/facerec/data/at/s2/1.pgm;1
