@@ -1,0 +1,119 @@
+\section{Installation Guide}
+
+This installation guide explains how to install the software for this document. \href{http://www.cmake.org}{CMake} is used as build system for the examples, \href{http://www.mingw.org}{MinGW (Minimalist GNU for Windows)} is used as the compiler for Windows and OpenCV2 is compiled from source. There are binaries for OpenCV2 already, so why is it useful to build it from source at all? Your architecture may not be supported by the binaries, your toolchain may differ or the OpenCV version in your repository may not be the latest. Please note: You can always use the binaries supplied by WillowGarage or the binaries supplied by your distribution if they work for you.
+
+The following guide was tested on Microsoft Windows XP SP3 and Ubuntu 10.10.
+
+\subsection{Installing CMake}
+\label{ssection:cmake}
+
+\lstset{
+	language=sh,
+}
+
+\href{http://www.cmake.org}{CMake} is an open-source, cross-platform build system. It manages the build process in a compiler-independent manner and is able to generate native build environments to compile the source code (\href{http://www.gnu.org/software/make/manual/}{Make}, \href{http://developer.apple.com/technologies/tools/}{Apple Xcode}, \href{http://www.microsoft.com/visualstudio/en-us}{Microsoft Visual Studio}, \href{http://www.mingw.org}{MinGW}, $\ldots$). Projects like \href{http://opencv.willowgarage.com}{OpenCV}, \href{http://www.kde.org}{KDE} or \href{http://www.blender.org}{Blender 3D} recently switched to CMake due to its flexibility. The CMake build process itself is controlled by configuration files, placed in the source directory (called \lstinline|CMakeLists.txt|). Each \lstinline|CMakeLists.txt| consists of CMake commands in the form of \lstinline|COMMAND(arguments...)|, that describe how to include header files, build libraries and executables. Please see the \href{http://www.cmake.org/cmake/help/cmake-2-8-docs.html}{CMake Documentation} for a list of available commands.
+
+A Windows installer is available at \href{http://www.cmake.org/cmake/resources/software.html}{cmake.org/resources/software.html} (called \lstinline|cmake-<version>-win32-x86.exe|). Make sure to select \textit{"Add CMake to the system PATH for all users"} during setup or manually add it, so you can use \lstinline|cmake|, \lstinline|ccmake| and the \lstinline|cmake-gui| from command line (see \href{http://support.microsoft.com/kb/310519}{Microsoft Support: How To Manage Environment Variables in Windows XP} for details). Linux users should check the repository of their distribution, because the CMake binaries are often available already. 
+
+If CMake is not available one can build it from source by:
+
+\begin{lstlisting}
+./bootstrap
+make 
+make install
+\end{lstlisting}
+
+Or install generic Linux binaries (called \lstinline|cmake-<version>-<os>-<architecture>.sh|):
+
+\begin{lstlisting}
+sudo sh cmake-<version>-<os>-<architecture>.sh --prefix=/usr/local 
+\end{lstlisting}
+
+\subsection{Installing MinGW}
+\label{ssection:mingw}
+
+\href{http://www.mingw.org}{MinGW (Minimalist GNU for Windows)} is a port of the \href{http://gcc.gnu.org}{GNU Compiler Collection (GCC)} and can be used for the development of native \href{http://www.microsoft.com/windows}{Microsoft Windows} applications. The easiest way to install MinGW is to use the automated mingw-get-installer \href{http://sourceforge.net/projects/mingw/files/Automated\%20MinGW\%20Installer/mingw-get-inst/}{from sourceforge.net/projects/mingw/files/Automated MinGW Installer/mingw-get-inst/} (called \textit{mingw-get-inst-20101030.exe} at time of writing this). If the path to the download changes, please navigate there from \href{http://www.mingw.org}{mingw.org}.
+
+Make sure to select \textit{"C++ Compiler"} in the \textit{Compiler Suite} dialog during setup. Since MinGW doesn't add its binaries to the Windows PATH environment, you'll need to manually add it. The MinGW Page says: \textit{Add }\lstinline|C:\MinGW\bin|\textit{ to the PATH environment variable by opening the System control panel, going to the Advanced tab, and clicking the Environment Variables button. If you currently have a Command Prompt window open, it will not recognize the change to the environment variables; you will need to open a new Command Prompt window to get the new PATH.}
+
+Linux users should install \href{http://gcc.gnu.org/}{gcc} and \href{http://www.gnu.org/software/make/}{make} (or a build tool supported by CMake) from the repository of their distribution. In Ubuntu the \lstinline|build-essential| package contains all necessary tools to get started, in Fedora and SUSE you'll need to install it from the available development tools.
+
+\subsection{Building OpenCV}
+
+Please skip this section if you are using the OpenCV binaries supplied by WillowGarage or your distribution. To build OpenCV you'll need CMake (see section \ref{ssection:cmake}), a C/C++ compiler (see section \ref{ssection:mingw}) and the OpenCV source code. At time of writing this, the latest OpenCV sources are available at \url{http://sourceforge.net/projects/opencvlibrary/}. I've heard the OpenCV page will see some changes soon, so if the sourceforge isn't used for future versions anymore navigate from the official page: \url{http://opencv.willowgarage.com}.
+
+In this guide I'll use \href{http://sourceforge.net/projects/opencvlibrary/files/opencv-win}{OpenCV 2.3.0} for Windows and \href{http://sourceforge.net/projects/opencvlibrary/files/opencv-unix}{OpenCV 2.3.1} for Linux. If you need the latest Windows version download the \href{http://sourceforge.net/projects/opencvlibrary/files/opencv-win/}{superpack}, which includes binaries and sources for Windows.
+
+\subsubsection*{Create the build folder}
+
+First of all extract the source code to a folder of your choice, then open a terminal and \lstinline|cd| into this folder. Then create a folder \lstinline|build|, where we will build OpenCV in:
+
+\begin{lstlisting}
+mkdir build
+cd build
+\end{lstlisting}
+
+\subsubsection*{Build OpenCV in Windows}
+
+Now we'll create the Makefiles to build OpenCV. You need to specify the path you want to install OpenCV to (e.g. \lstinline|C:/opencv|), preferrably it's not the source folder. Note, that CMake expects a slash (\lstinline|/|) as path separator. So if you are using Windows you'll now write:
+
+\begin{lstlisting}
+cmake -G "MinGW Makefiles" -D:CMAKE_BUILD_TYPE=RELEASE -D:BUILD_EXAMPLES=1 -D:CMAKE_INSTALL_PREFIX=C:/opencv ..
+mingw32-make 
+mingw32-make install
+\end{lstlisting}
+
+Usually CMake is good at guessing the parameters, but there are a lot more options you can set (for Qt, Python, ..., see \href{http://opencv.willowgarage.com/wiki/InstallGuide}{WillowGarage's Install Guide} for details). It's a good idea to use the \lstinline|cmake-gui| to see and set the available switches. For now you can stick to the Listing, it works fine for Windows and Linux.
+
+Better get a coffee, because OpenCV takes a while to compile! Once it is finished and you've decided to build dynamic libraries (assumed in this installation guide), you have to add the \lstinline|bin| path of the installation to Windows \lstinline|PATH| variable (e.g. \lstinline|C:/opencv/bin|). If you don't know how to do that, see \href{http://support.microsoft.com/kb/310519}{Microsoft Support: How To Manage Environment Variables in Windows XP} for details.
+
+\subsubsection*{Build OpenCV in Linux}
+Creating the Makefiles in Linux is (almost) similar to Windows. Again choose a path you want to install OpenCV to (e.g. \lstinline|/usr/local|), preferrably it's not the source folder.
+
+\begin{lstlisting}[numberstyle=\footnotesize, numbers=left]
+cmake -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_EXAMPLES=1 -D CMAKE_INSTALL_PREFIX=/usr/local ..
+make 
+sudo make install
+\end{lstlisting}
+
+\subsubsection*{Sample CMakeLists.txt}
+Once CMake is installed a simple \lstinline|CMakeLists.txt| is sufficient for building an OpenCV project (this is the build file for the example in this document):
+
+\lstset{
+	language=cmake,
+}
+\begin{lstlisting}
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+PROJECT( ml_opencv )
+FIND_PACKAGE( OpenCV REQUIRED )
+ADD_EXECUTABLE( ml main.cpp )
+TARGET_LINK_LIBRARIES(ml ${OpenCV_LIBS})
+\end{lstlisting}
+
+To build and run the project one would simply do (assuming we're in the folder with \lstinline|CMakeLists.txt|):
+
+\lstset{
+	language=sh,
+}
+\begin{lstlisting}
+# create build directory 
+mkdir build
+# ... and cd into
+cd build
+# generate platform-dependent makefiles
+cmake ..
+# build the project
+make
+# run the executable
+./ml
+\end{lstlisting}
+
+Or if you are on Windows with MinGW you would do:
+
+\begin{lstlisting}
+mkdir build
+cd build
+cmake -G "MinGW Makefiles" ..
+mingw32-make
+ml.exe
+\end{lstlisting}

@@ -1,102 +1,100 @@
-\documentclass[10pt]{scrartcl}
-
-\usepackage{abstract}
+\documentclass[10pt]{article}
 
 \usepackage[utf8]{inputenc}
 
 \usepackage{tabularx}
-
 \usepackage{amsmath}
 \usepackage{amssymb}
-% rand
 \usepackage{geometry}
 \geometry{a4paper, top=25mm, left=30mm, right=25mm, bottom=30mm,
          headsep=10mm, footskip=12mm}
 
 \usepackage{graphicx}
 \usepackage{url}
-
-\usepackage{graphicx}
 \usepackage[pdftex,colorlinks=true,citecolor=blue,urlcolor=blue,linkcolor=blue]{hyperref}
-
-
 \usepackage{color}
 \usepackage{xcolor}
-
 \usepackage{tabularx}
-
-\usepackage{amsmath}
-\usepackage{amssymb}
-%\usepackage{lscape}
-%\usepackage{ragged2e}
-
 \usepackage{listings}
-
+\usepackage{parcolumns}
+\usepackage{longtable}
 \usepackage[margin=10pt]{caption}
 
-\newtheorem{definition}{Definition}
+% set the title
+\title{\begin{tabular}{p{11cm}}\centering
+Face Recognition with OpenCV2
+\end{tabular}}
 
+% contact details
+\author{Philipp Wagner\\\href{http://www.bytefish.de}{http://www.bytefish.de}}
 
-\author{Philipp Wagner\thanks{\url{http://www.bytefish.de}, bytefish--at--gmx--dot--de}}
-\title{Statistical Machine Learning with OpenCV}
-%\date{Wintersemester 2010}
-
-\RequirePackage{listings}
-\lstdefinelanguage{pseudocode}{
-morekeywords=[1]{procedure, while, do, endwhile},
-morecomment=[l]{\%}
-}
-
-\lstset{%
-	frame=lines,
-	columns=fullflexible
-}
-
+% colors for syntax highlightning
 \definecolor{darkblue}{rgb}{0,0,.6}
 \definecolor{darkred}{rgb}{.6,0,0}
 \definecolor{darkgreen}{rgb}{0,.6,0}
 \definecolor{red}{rgb}{.98,0,0}
 
+
+% Listings Style
+\lstset{
+	numberstyle=\footnotesize, 
+	basicstyle=\footnotesize\ttfamily
+	numbers=left, 
+	numbersep=5pt, 
+	frame=single
+}
+
+% Add basic syntax highlightning to C++
+\lstset{
+	numberstyle=\footnotesize, 
+	basicstyle=\footnotesize\ttfamily,
+	numbers=none, 
+	numbersep=5pt, 
+	frame=single,
+	breaklines=true,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2,
+}
+
 \lstloadlanguages{C++}
-\lstset{%
-  language=C++,
-  basicstyle=\tiny\sffamily,
-  commentstyle=\itshape\color{darkgreen},
-  keywordstyle=\bfseries\color{darkblue},
-  stringstyle=\color{darkred},
-  frame=lines,
-  columns=fullflexible,
-  showspaces=false
-}%
+\lstset{
+	language=C++,
+  commentstyle=\footnotesize\ttfamily\color{darkgreen},
+  keywordstyle=\footnotesize\ttfamily\color{darkblue},
+  stringstyle=\footnotesize\ttfamily\color{darkred},
+}
 
-% redefine lstinline
-\makeatletter
-\lst@AddToHook{TextStyle}{\let\lst@basicstyle\normalsize\sffamily}
-\makeatother
+\lstdefinelanguage{cmake}{
+	morekeywords={cmake_minimum_required, project, find\_package, add\_executable, target\_link\_libraries},
+	sensitive=false,
+	morecomment=[l]{\#},
+}
 
-% change vertical space of itemize and enumeration environments
+% change vertical space of itemize, description and enumeration environments
 \let\olditemize=\itemize
    \def\itemize{\olditemize\setlength{\itemsep}{-0.5ex}}
 \let\oldenumerate=\enumerate
    \def\enumerate{\oldenumerate\setlength{\itemsep}{-0.5ex}}
-
+\let\olddescription=\description
+   \def\description{\olddescription\setlength{\itemsep}{-0.5ex}}
+   
+% don't indent sections
+\setlength{\parindent}{0pt}
 
 \begin{document}
 
 \maketitle
-
-% abstract info
-\begin{abstract}
-This document is an introduction to Machine Learning with OpenCV. Artificial Neural Networks and Support Vector Machines are briefly explained and examples in OpenCV are given.
-\end{abstract}
+\tableofcontents
 
 % include sections
-\input{chapters/introduction.tex}
-\input{chapters/setup.tex}
-\input{chapters/data.tex}
-\input{chapters/svm.tex}
-\input{chapters/mlp.tex}
-\input{chapters/evaluation.tex}
+\input{section/introduction.tex}
+\input{section/installation.tex}
+\input{section/data.tex}
+\input{section/svm.tex}
+\input{section/mlp.tex}
+\input{section/evaluation.tex}
 
 \appendix
 
