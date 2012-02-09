@@ -1,0 +1,94 @@
+\section{Generating Data: Random Numbers in OpenCV}
+We want to see how the Machine Learning algorithms perform on linearly separable and non-linearly separable datasets. For this we'll simply generate some random data from several functions. Each thread in OpenCV has access to a default random number generator \lstinline|cv::theRNG()|. For a single pass the seed for the random number generator doesn't have to be set, but if many random numbers have to be generated (for example in a loop) the seed has to be set.
+
+This can be done by assigning the local time to the random number generator:
+
+\begin{lstlisting}
+ cv::theRNG() = cv::RNG(time(0))
+\end{lstlisting}
+
+\subsection{Uniform Distribution}
+Uniform Distributions can be generated in OpenCV with the help of \textit{cv::randu}. The signature of \textit{cv::randu} is:
+\begin{lstlisting}[language=C++]
+void randu(Mat& mtx, const Scalar& low, const Scalar& high);
+\end{lstlisting}
+Where
+\begin{itemize}
+ \item \textbf{mtx} is the Matrix to be filled with uniform distributed random numbers
+ \item \textbf{low} is the inclusive lower boundary of generated random numbers
+ \item \textbf{high} is the exclusive upper boundary of generated random numbers
+\end{itemize}
+
+\subsection{Normal Distribution}
+A Normal Distribution can be generated in OpenCv with the help of \textit{cv::randn}.
+\begin{lstlisting}[language=C++]
+void randn(Mat& mtx, const Scalar& mean, const Scalar& stddev);
+\end{lstlisting}
+Where
+\begin{itemize}
+ \item \textbf{mtx} is the Matrix to be filled with normal distributed random numbers
+ \item \textbf{mean} the mean value of the generated random numbers
+ \item \textbf{stddev} the standard deviation of the generated random numbers
+\end{itemize}
+
+\section{Preparing the Training and Test Dataset for OpenCV ML}
+In the C++ Machine Learning API of OpenCV training and test data is given as a \lstinline|cv::Mat| matrix. The constructor of \lstinline|cv::Mat| is defined as:
+\begin{lstlisting}[language=C++]
+Mat::Mat(int rows, int cols, int type);
+\end{lstlisting}
+Where
+\begin{itemize}
+ \item rows is the number of samples (for all classes!)
+ \item columns is the number of dimensions
+ \item type is the image type
+\end{itemize}
+
+In the machine learning library of OpenCV each row or column in the training data is a n-dimensional sample. The default ordering is row sampling and class labels are given in a matrix with equal length (one column only, of course). 
+
+\begin{lstlisting}[language=C++]
+cv::Mat trainingData(numTrainingPoints, 2, CV_32FC1);
+cv::Mat testData(numTestPoints, 2, CV_32FC1);
+
+cv::randu(trainingData,0,1);
+cv::randu(testData,0,1);
+
+cv::Mat trainingClasses = labelData(trainingData, equation);
+cv::Mat testClasses = labelData(testData, equation);
+\end{lstlisting}
+
+Since only binary classification problems are considered the function \lstinline|f| returns the classes $-1$ and $1$ for a given two-dimensional data point:
+
+\begin{lstlisting}[language=C++]
+// function to learn
+int f(float x, float y, int equation) {
+  switch(equation) {
+  case 0:
+    return y > sin(x*10) ? -1 : 1;
+    break;
+  case 1:
+    return y > cos(x * 10) ? -1 : 1;
+    break;
+  case 2:
+    return y > 2*x ? -1 : 1;
+    break;
+  case 3:
+    return y > tan(x*10) ? -1 : 1;
+    break;
+  default:
+    return y > cos(x*10) ? -1 : 1;
+  }
+}
+\end{lstlisting}
+
+And to label data one can use the function \lstinline|labelData|:
+\begin{lstlisting}
+cv::Mat labelData(cv::Mat points, int equation) {
+  cv::Mat labels(points.rows, 1, CV_32FC1);
+  for(int i = 0; i < points.rows; i++) {
+    float x = points.at<float>(i,0);
+    float y = points.at<float>(i,1);
+    labels.at<float>(i, 0) = f(x, y, equation);
+  }
+  return labels;
+}
+\end{lstlisting}

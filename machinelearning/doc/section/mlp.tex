@@ -1,0 +1,99 @@
+\section{Multi Layer Perceptron}
+An Artificial Neural Network is a biological inspired computational model. \textit{Inputs} multiplied by \textit{weights} result in an \textit{activation} and form the \textit{output} of a network. Research in Artificial Neural Networks (ANN) began in 1943, when McCulloch and Pitts gave a definition of a formal neuron in their paper \textit{"A Logical Calculus of the Ideas Immanent in Nervous Activity"} \cite{culloch1943}. In 1958 Rosenblatt invented the perceptron, which is a simple feedforward neural network. The downfall of the perceptron algorithm is that it only converges on lineary seperable datasets and is not able to solve non-lineary problems such as the XOR problem. This was proven by Minsky and Papert in their monograph \textit{"Perceptrons"}, but they showed that a two-layer feedforward architecture can overcome this limitation. It was until 1986 when Rumelhart, Hinton and Williams presented a learning rule for Aritificial Neural Networks with hidden units in their paper \textit{"Learning Internal Representations by Error Propagation"}. The original discovery of backpropagation is actually credited to Werbos who described the algorithm in his 1974 Ph.D. thesis at Havard University, see \cite{werbos1994} for the roots of backpropagation.
+
+A detailed introduction to Pattern Recognition with Neural Networks is given by \cite{Bishop95}.
+
+\subsection{Backpropagation}
+
+\begin{enumerate}
+ \item Initilaize weights with random values
+ \item Present the input vector to the network
+ \item Evaluate the output of the network after a forward propagation of the signal
+ \item Calculate $\delta_j = (y_j - d_j)$ where $d_j$ is the target output of neuron $j$ and $y_j$ is the actual output $y_j = g(\sum_i{ w_{ij}x_i}) = (1 + e^{-\sum_i{w_{ij}x_i}})^{-1}$, (when the activation function is of a sigmoid type).
+\item For all other neurons (from the first to the last layer) calculate $\delta_j = \sum_k{w_{jk} g'(x)\delta_k}$, where  $\delta_k$ is $\delta_j$ of the succeeding layer and $g'(x) = y_k(1-y_k)$
+\item Update weights with $w_{ij}(t+1) = w_{ij}(t) - \eta y_i y_j(1-y_j) \delta_j$, where $\eta$ is the learning rate.
+\item Termination Criteria. Goto Step 2 for a fixed number of iterations or an error.
+\end{enumerate}
+
+The network error is defined as:
+$$E = \frac{1}{2} \sum_{j=1}^{m}{(d_j - y_j)^2} $$
+
+\subsection{MLP in OpenCV}
+A Multilayer Perceptron in OpenCV is an instance of \lstinline|CvANN_MLP|.
+
+\begin{lstlisting}[language=C++]
+CvANN_MLP mlp;
+\end{lstlisting}
+
+\subsubsection*{Parameters}
+The performance of a Multilayer perceptron depends on its parameters:
+
+\begin{lstlisting}[language=C++]
+CvTermCriteria criteria;
+criteria.max_iter = 100;
+criteria.epsilon = 0.00001f;
+criteria.type = CV_TERMCRIT_ITER | CV_TERMCRIT_EPS;
+
+CvANN_MLP_TrainParams params;
+params.train_method = CvANN_MLP_TrainParams::BACKPROP;
+params.bp_dw_scale = 0.05f;
+params.bp_moment_scale = 0.05f;
+params.term_crit = criteria;
+\end{lstlisting}
+
+Where the parameters are (taken from the OpenCV 1.0 documentation\footnote{\url{http://www.cognotics.com/opencv/docs/1.0/ref/opencvref_ml.htm}}):
+\begin{itemize}
+
+\item \lstinline|term_crit| The termination criteria for the training algorithm. It identifies how many iterations is done by the algorithm (for sequential backpropagation algorithm the number is multiplied by the size of the training set) and how much the weights could change between the iterations to make the algorithm continue. 
+
+\item \lstinline|train_method| The training algoithm to use; can be one of \lstinline|CvANN_MLP_TrainParams::BACKPROP| (sequential backpropagation algorithm) or \lstinline|CvANN_MLP_TrainParams::RPROP| (RPROP algorithm, default value). 
+
+\item \lstinline|bp_dw_scale|
+    (Backpropagation only): The coefficient to multiply the computed weight gradient by. The recommended value is about $0.1$.
+\item \lstinline|bp_moment_scale|
+    (Backpropagation only): The coefficient to multiply the difference between weights on the $2$ previous iterations. This parameter provides some inertia to smooth the random fluctuations of the weights. It can vary from $0$ (the feature is disabled) to $1$ and beyond. The value $0.1$ or so is good enough.
+\item \lstinline|rp_dw0|
+    (RPROP only): Initial magnitude of the weight delta. The default value is $0.1$.
+\item \lstinline|rp_dw_plus|
+    (RPROP only): The increase factor for the weight delta. It must be $>1$, default value is $1.2$ that should work well in most cases, according to the algorithm's author.
+\item \lstinline|rp_dw_minus|
+    (RPROP only): The decrease factor for the weight delta. It must be $<1$, default value is $0.5$ that should work well in most cases, according to the algorithm's author.
+\item \lstinline|rp_dw_min|
+    (RPROP only): The minimum value of the weight delta. It must be $>0$, the default value is \lstinline|FLT_EPSILON|. 
+\item \lstinline|rp_dw_max|
+    (RPROP only): The maximum value of the weight delta. It must be $>1$, the default value is $50$. 
+\end{itemize}
+
+
+\subsubsection*{Layers}
+The purpose of a neural network is to generalize, which is the ability to approximate outputs for inputs not available in the training set. \cite{Sa02} While small networks may not be able to approximate a function, large networks tend to overfit and not find any relationship in data.\footnote{The model describes random error or noise instead of the relationship of the data.} It has been shown that, given enough data, a multi layer perceptron with one hidden layer can approximate any continuous function to any degree of accuracy. \cite{HSW92}
+
+The number of neurons per layer is stored in a row-ordered \lstinline|cv::Mat|.
+
+\begin{lstlisting}[language=C++]
+cv::Mat layers = cv::Mat(4, 1, CV_32SC1);
+
+layers.row(0) = cv::Scalar(2);
+layers.row(1) = cv::Scalar(10);
+layers.row(2) = cv::Scalar(15);
+layers.row(3) = cv::Scalar(1);
+
+mlp.create(layers);
+\end{lstlisting}
+
+\subsubsection*{Training}
+The API for training a multilayer perceptron takes the training data, training classes and the structure for the parameters.
+
+\begin{lstlisting}[language=C++]
+mlp.train(trainingData, trainingClasses, cv::Mat(), cv::Mat(), params);
+\end{lstlisting}
+
+\subsubsection*{Prediction}
+The API for the prediction is slightly different from the SVM API. Activations of the output layer are stored in a \lstinline|cv::Mat| response, simply because one can design neural networks with multiple neurons in the output layer.
+
+Since the problem used in this example is a binary classification problem, it is sufficient to have only one neuron in the output layer. It is therefore the only activation to check.
+
+\begin{lstlisting}[language=C++]
+mlp.predict(sample, response);
+float result = response.at<float>(0,0);
+\end{lstlisting}
