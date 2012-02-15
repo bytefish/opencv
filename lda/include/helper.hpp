@@ -45,7 +45,8 @@ template<typename _Tp>
 vector<int> argsort_(const Mat& src, bool sortAscending=true);
 vector<int> argsort(const Mat& src, bool sortAscending=true);
 
-vector<int> vec_unqiue(vector<int> src);
+
+vector<int> remove_dups(const vector<int>& src);
 
 //! turns a vector of matrices into a row matrix
 Mat asRowMatrix(const vector<Mat>& src);

@@ -30,6 +30,13 @@
 using namespace cv;
 using namespace std;
 
+
+template<typename _Tp>
+void vec_print(const vector<_Tp>& src) {
+	for(int i=0;i<src.size();i++)
+		cout << src[i] << endl;
+}
+
 void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels) {
 	std::ifstream file(filename.c_str(), ifstream::in);
 	if(!file)
@@ -127,6 +134,7 @@ int main(int argc, const char *argv[]) {
 	// ... and delete last element
 	images.pop_back();
 	labels.pop_back();
+
 	// build the Fisherfaces model
 	subspace::Fisherfaces model(images, labels);
 	// test model
@@ -136,7 +144,7 @@ int main(int argc, const char *argv[]) {
 	// get the eigenvectors
 	Mat W = model.eigenvectors();
 	// show first 10 fisherfaces
-	for(int i = 0; i < 10; i++) {
+	for(int i = 0; i < W.cols; i++) {
 		Mat ev = W.col(i).clone();
 		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}

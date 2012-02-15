@@ -61,7 +61,7 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	data.convertTo(data, CV_64FC1);
 	// maps the labels, so they have an ascending identifier from 0:C
 	vector<int> mapped_labels(labels.size());
-	vector<int> num2label = cv::vec_unqiue(labels);
+	vector<int> num2label = cv::remove_dups(labels);
 	map<int,int> label2num;
 	for(int i=0;i<num2label.size();i++)
 		label2num[num2label[i]] = i;

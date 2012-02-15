@@ -49,7 +49,7 @@ void subspace::Fisherfaces::compute(const Mat& src, const vector<int>& labels) {
 	// compute the Fisherfaces
 	int N = data.rows; // number of samples
 	int D = data.cols; // dimension of samples
-	int C = vec_unqiue(labels).size(); // number of unique classes
+	int C = remove_dups(labels).size(); // number of unique classes
 	// clip number of components to be a valid number
 	if((_num_components <= 0) || (_num_components > (C-1)))
 		_num_components = (C-1);

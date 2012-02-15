@@ -18,6 +18,7 @@
 
 #include "helper.hpp"
 #include <iostream>
+#include <set>
 using namespace cv;
 
 //! sort order for shuffle
@@ -69,10 +70,20 @@ Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
 	return dst;
 }
 
-vector<int> cv::vec_unqiue(vector<int> src) {
-	src.erase(unique(src.begin(),src.end()), src.end());
-	return src;
+vector<int> cv::remove_dups(const vector<int>& src) {
+	set<int> set_elems;
+	for(vector<int>::const_iterator it = src.begin();
+			it != src.end();
+			++it)
+		set_elems.insert(*it);
+	vector<int> elems;
+	for(set<int>::const_iterator it = set_elems.begin();
+				it != set_elems.end();
+				++it)
+		elems.push_back(*it);
+	return elems;
 }
+
 
 template<typename _Tp>
 vector<int> cv::argsort_(const Mat& src, bool asc) {
