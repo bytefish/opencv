@@ -30,13 +30,6 @@
 using namespace cv;
 using namespace std;
 
-
-template<typename _Tp>
-void vec_print(const vector<_Tp>& src) {
-	for(int i=0;i<src.size();i++)
-		cout << src[i] << endl;
-}
-
 void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels) {
 	std::ifstream file(filename.c_str(), ifstream::in);
 	if(!file)
