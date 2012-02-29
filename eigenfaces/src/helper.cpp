@@ -74,6 +74,9 @@ Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
 
 Mat cv::asColumnMatrix(const vector<Mat>& src, int type) {
 	int n = src.size();
+	// no data? so here's an empty matrix
+	if(n == 0)
+		return Mat();
 	int d = src[0].total();
 	Mat data(d, n, type);
 	for(int i = 0; i < src.size(); i++) {
@@ -87,6 +90,9 @@ Mat cv::asColumnMatrix(const vector<Mat>& src, int type) {
 
 Mat cv::asRowMatrix(const vector<Mat>& src, int type) {
 	int n = src.size();
+	// no data? so here's an empty matrix
+	if(n == 0)
+		return Mat();
 	int d = src[0].total();
 	Mat data(n, d, type);
 	for(int i = 0; i < src.size(); i++) {
