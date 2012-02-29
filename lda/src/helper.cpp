@@ -119,6 +119,9 @@ vector<int> cv::argsort(const Mat& src, bool asc) {
 
 Mat cv::asColumnMatrix(const vector<Mat>& src) {
 	int n = src.size();
+	// no data? so here's an empty matrix
+	if(n == 0)
+		return Mat();
 	int d = src[0].total();
 	Mat data(d, n, CV_32FC1);
 	for(int i = 0; i < src.size(); i++) {
@@ -132,6 +135,9 @@ Mat cv::asColumnMatrix(const vector<Mat>& src) {
 
 Mat cv::asRowMatrix(const vector<Mat>& src) {
 	int n = src.size();
+	// no data? so here's an empty matrix
+	if(n == 0)
+		return Mat();
 	int d = src[0].total();
 	Mat data(n, d, CV_32FC1);
 	for(int i = 0; i < src.size(); i++) {
