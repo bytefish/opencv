@@ -28,7 +28,7 @@ Mat subspace::project(const Mat& W, const Mat& mean, const Mat& src, bool dataAs
 	Mat data, X, Y;
 	int n = dataAsRow ? src.rows : src.cols;
 	// convert to correct type
-	src.convertTo(data, _eigenvectors.type());
+	src.convertTo(data, mean.type());
 	// center data (X-mean)
 	subtract(dataAsRow ? data : transpose(data),
 			repeat(dataAsRow ? mean : transpose(mean), n, 1),

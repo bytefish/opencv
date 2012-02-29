@@ -67,7 +67,7 @@ Mat Eigenfaces::project(const Mat& src) {
 	Mat data, X, Y;
 	int n = _dataAsRow ? src.rows : src.cols;
 	// convert to correct type
-	src.convertTo(data, _eigenvectors.type());
+	src.convertTo(data, _mean.type());
 	// center data
 	subtract(_dataAsRow ? data : transpose(data),
 			repeat(_mean.reshape(1,1), n, 1),
