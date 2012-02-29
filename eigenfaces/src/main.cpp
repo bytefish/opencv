@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 	// get the eigenvectors
 	Mat W = eigenfaces.eigenvectors();
 	// show first 10 eigenfaces
-	for(int i = 0; i < 10; i++) {
+	for(int i = 0; i < min(10,W.cols); i++) {
 		Mat ev = W.col(i).clone();
 		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}

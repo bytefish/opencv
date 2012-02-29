@@ -72,17 +72,15 @@ Mat cv::sortMatrixByRow(const Mat& src, vector<int> sorted_indices) {
 
 vector<int> cv::remove_dups(const vector<int>& src) {
 	set<int> set_elems;
-	for(vector<int>::const_iterator it = src.begin();
-			it != src.end();
-			++it)
+	for (vector<int>::const_iterator it = src.begin(); it != src.end(); ++it)
 		set_elems.insert(*it);
 	vector<int> elems;
-	for(set<int>::const_iterator it = set_elems.begin();
-				it != set_elems.end();
-				++it)
+	for (set<int>::const_iterator it = set_elems.begin(); it != set_elems.end(); ++it)
 		elems.push_back(*it);
 	return elems;
 }
+
+
 
 
 template<typename _Tp>

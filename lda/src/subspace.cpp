@@ -25,14 +25,14 @@ using namespace cv;
 
 //! computes Y = (X-mean)*W
 Mat subspace::project(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow) {
-	Mat X,Y;
+	Mat data, X, Y;
 	int n = dataAsRow ? src.rows : src.cols;
-	// center data
-	subtract(dataAsRow ? src : transpose(src),
+	// convert to correct type
+	src.convertTo(data, _eigenvectors.type());
+	// center data (X-mean)
+	subtract(dataAsRow ? data : transpose(data),
 			repeat(dataAsRow ? mean : transpose(mean), n, 1),
-			X,
-			Mat(),
-			W.type());
+			X);
 	// Y = (X-mean)*W
 	gemm(X, W, 1.0, Mat(), 0.0, Y);
 	return dataAsRow ? Y : transpose(Y);

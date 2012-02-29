@@ -127,7 +127,6 @@ int main(int argc, const char *argv[]) {
 	// ... and delete last element
 	images.pop_back();
 	labels.pop_back();
-
 	// build the Fisherfaces model
 	subspace::Fisherfaces model(images, labels);
 	// test model
@@ -137,7 +136,7 @@ int main(int argc, const char *argv[]) {
 	// get the eigenvectors
 	Mat W = model.eigenvectors();
 	// show first 10 fisherfaces
-	for(int i = 0; i < W.cols; i++) {
+	for(int i = 0; i < min(10,W.cols); i++) {
 		Mat ev = W.col(i).clone();
 		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
 	}
