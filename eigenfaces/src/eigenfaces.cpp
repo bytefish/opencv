@@ -64,14 +64,14 @@ int Eigenfaces::predict(const Mat& src) {
 }
 
 Mat Eigenfaces::project(const Mat& src) {
-	Mat X,Y;
+	Mat data, X, Y;
 	int n = _dataAsRow ? src.rows : src.cols;
+	// convert to correct type
+	src.convertTo(data, _eigenvectors.type());
 	// center data
-	subtract(_dataAsRow ? src : transpose(src),
+	subtract(_dataAsRow ? data : transpose(data),
 			repeat(_mean.reshape(1,1), n, 1),
-			X,
-			Mat(),
-			_eigenvectors.type());
+			X);
 	// Y = (X-mean)*W
 	gemm(X, _eigenvectors, 1.0, Mat(), 0.0, Y);
 	return _dataAsRow ? Y : transpose(Y);
