@@ -22,7 +22,23 @@
 
 using namespace cv;
 using namespace std;
-
+/**
+ *
+ * This class is just a rip-off of the EigenvalueSolver in JAMA
+ * (http://math.nist.gov/javanumerics/jama), which include public-domain
+ * implementation of linear algebra algorithms. I give the credit to the
+ * original authors (http://math.nist.gov/javanumerics/jama/#Authors).
+ *
+ * Copyright Notice in JAMA
+ *
+ * This software is a cooperative product of The MathWorks and
+ * the National Institute of Standards and Technology (NIST) which has been
+ * released to the public domain. Neither The MathWorks nor NIST assumes any
+ * responsibility whatsoever for its use by other parties, and makes no
+ * guarantees, expressed or implied, about its quality, reliability, or any
+ * other characteristic.
+ *
+ */
 template<typename DataType>
 class EigenvalueDecomposition {
 private:
@@ -79,7 +95,10 @@ private:
 		}
 	}
 
+	// Nonsymmetric reduction from Hessenberg to real Schur form.
+
 	void hqr2() {
+
 		//  This is derived from the Algol procedure hqr2,
 		//  by Martin and Wilkinson, Handbook for Auto. Comp.,
 		//  Vol.ii-Linear Algebra, and the corresponding
@@ -91,29 +110,26 @@ private:
 		int low = 0;
 		int high = nn - 1;
 		double eps = pow(2.0, -52.0);
+		double exshift = 0.0;
+		double p = 0, q = 0, r = 0, s = 0, z = 0, t, w, x, y;
+
 		// Store roots isolated by balanc and compute matrix norm
+
 		double norm = 0.0;
 		for (int i = 0; i < nn; i++) {
-			if (i < low || i > high) {
+			if (i < low | i > high) {
 				d[i] = H[i][i];
 				e[i] = 0.0;
 			}
 			for (int j = max(i - 1, 0); j < nn; j++) {
-				norm += abs(H[i][j]);
+				norm = norm + abs(H[i][j]);
 			}
 		}
+
 		// Outer loop over eigenvalue index
 		int iter = 0;
-		double y;
-		double x;
-		double w;
-		double z = 0;
-		double s = 0;
-		double r = 0;
-		double q = 0;
-		double p = 0;
-		double exshift = 0.0;
 		while (n >= low) {
+
 			// Look for single small sub-diagonal element
 			int l = n;
 			while (l > low) {
@@ -131,7 +147,7 @@ private:
 			// One root found
 
 			if (l == n) {
-				H[n][n] += exshift;
+				H[n][n] = H[n][n] + exshift;
 				d[n] = H[n][n];
 				e[n] = 0.0;
 				n--;
@@ -144,10 +160,12 @@ private:
 				p = (H[n - 1][n - 1] - H[n][n]) / 2.0;
 				q = p * p + w;
 				z = sqrt(abs(q));
-				H[n][n] += exshift;
-				H[n - 1][n - 1] += exshift;
+				H[n][n] = H[n][n] + exshift;
+				H[n - 1][n - 1] = H[n - 1][n - 1] + exshift;
 				x = H[n][n];
+
 				// Real pair
+
 				if (q >= 0) {
 					if (p >= 0) {
 						z = p + z;
@@ -166,10 +184,11 @@ private:
 					p = x / s;
 					q = z / s;
 					r = sqrt(p * p + q * q);
-					p /= r;
-					q /= r;
+					p = p / r;
+					q = q / r;
 
 					// Row modification
+
 					for (int j = n - 1; j < nn; j++) {
 						z = H[n - 1][j];
 						H[n - 1][j] = q * z + p * H[n][j];
@@ -177,6 +196,7 @@ private:
 					}
 
 					// Column modification
+
 					for (int i = 0; i <= n; i++) {
 						z = H[i][n - 1];
 						H[i][n - 1] = q * z + p * H[i][n];
@@ -184,6 +204,7 @@ private:
 					}
 
 					// Accumulate transformations
+
 					for (int i = low; i <= high; i++) {
 						z = V[i][n - 1];
 						V[i][n - 1] = q * z + p * V[i][n];
@@ -191,17 +212,22 @@ private:
 					}
 
 					// Complex pair
+
 				} else {
 					d[n - 1] = x + p;
 					d[n] = x + p;
 					e[n - 1] = z;
 					e[n] = -z;
 				}
-				n -= 2;
+				n = n - 2;
 				iter = 0;
+
 				// No convergence yet
+
 			} else {
+
 				// Form shift
+
 				x = H[n][n];
 				y = 0.0;
 				w = 0.0;
@@ -209,7 +235,9 @@ private:
 					y = H[n - 1][n - 1];
 					w = H[n][n - 1] * H[n - 1][n];
 				}
+
 				// Wilkinson's original ad hoc shift
+
 				if (iter == 10) {
 					exshift += x;
 					for (int i = low; i <= n; i++) {
@@ -219,7 +247,9 @@ private:
 					x = y = 0.75 * s;
 					w = -0.4375 * s * s;
 				}
+
 				// MATLAB's new ad hoc shift
+
 				if (iter == 30) {
 					s = (y - x) / 2.0;
 					s = s * s + w;
@@ -237,7 +267,7 @@ private:
 					}
 				}
 
-				iter += 1; // (Could check iteration count here.)
+				iter = iter + 1; // (Could check iteration count here.)
 
 				// Look for two consecutive small sub-diagonal elements
 				int m = n - 2;
@@ -249,9 +279,9 @@ private:
 					q = H[m + 1][m + 1] - z - r - s;
 					r = H[m + 2][m + 1];
 					s = abs(p) + abs(q) + abs(r);
-					p /= s;
-					q /= s;
-					r /= s;
+					p = p / s;
+					q = q / s;
+					r = r / s;
 					if (m == l) {
 						break;
 					}
@@ -280,9 +310,9 @@ private:
 						r = (notlast ? H[k + 2][k - 1] : 0.0);
 						x = abs(p) + abs(q) + abs(r);
 						if (x != 0.0) {
-							p /= x;
-							q /= x;
-							r /= x;
+							p = p / x;
+							q = q / x;
+							r = r / x;
 						}
 					}
 					if (x == 0.0) {
@@ -298,23 +328,23 @@ private:
 						} else if (l != m) {
 							H[k][k - 1] = -H[k][k - 1];
 						}
-						p += s;
+						p = p + s;
 						x = p / s;
 						y = q / s;
 						z = r / s;
-						q /= p;
-						r /= p;
+						q = q / p;
+						r = r / p;
 
 						// Row modification
 
 						for (int j = k; j < nn; j++) {
 							p = H[k][j] + q * H[k + 1][j];
 							if (notlast) {
-								p += r * H[k + 2][j];
-								H[k + 2][j] -= p * z;
+								p = p + r * H[k + 2][j];
+								H[k + 2][j] = H[k + 2][j] - p * z;
 							}
-							H[k][j] -= p * x;
-							H[k + 1][j] -= p * y;
+							H[k][j] = H[k][j] - p * x;
+							H[k + 1][j] = H[k + 1][j] - p * y;
 						}
 
 						// Column modification
@@ -322,22 +352,23 @@ private:
 						for (int i = 0; i <= min(n, k + 3); i++) {
 							p = x * H[i][k] + y * H[i][k + 1];
 							if (notlast) {
-								p += z * H[i][k + 2];
-								H[i][k + 2] -= p * r;
+								p = p + z * H[i][k + 2];
+								H[i][k + 2] = H[i][k + 2] - p * r;
 							}
-							H[i][k] -= p;
-							H[i][k + 1] -= p * q;
+							H[i][k] = H[i][k] - p;
+							H[i][k + 1] = H[i][k + 1] - p * q;
 						}
 
 						// Accumulate transformations
+
 						for (int i = low; i <= high; i++) {
 							p = x * V[i][k] + y * V[i][k + 1];
 							if (notlast) {
-								p += z * V[i][k + 2];
-								V[i][k + 2] -= p * r;
+								p = p + z * V[i][k + 2];
+								V[i][k + 2] = V[i][k + 2] - p * r;
 							}
-							V[i][k] -= p;
-							V[i][k + 1] -= p * q;
+							V[i][k] = V[i][k] - p;
+							V[i][k + 1] = V[i][k + 1] - p * q;
 						}
 					} // (s != 0)
 				} // k loop
@@ -345,6 +376,7 @@ private:
 		} // while (n >= low)
 
 		// Backsubstitute to find vectors of upper triangular form
+
 		if (norm == 0.0) {
 			return;
 		}
@@ -355,7 +387,6 @@ private:
 
 			// Real vector
 
-			double t;
 			if (q == 0) {
 				int l = n;
 				H[n][n] = 1.0;
@@ -363,7 +394,7 @@ private:
 					w = H[i][i] - p;
 					r = 0.0;
 					for (int j = l; j <= n; j++) {
-						r += H[i][j] * H[j][n];
+						r = r + H[i][j] * H[j][n];
 					}
 					if (e[i] < 0.0) {
 						z = w;
@@ -397,7 +428,7 @@ private:
 						t = abs(H[i][n]);
 						if ((eps * t) * t > 1) {
 							for (int j = i; j <= n; j++) {
-								H[j][n] /= t;
+								H[j][n] = H[j][n] / t;
 							}
 						}
 					}
@@ -421,11 +452,12 @@ private:
 				H[n][n - 1] = 0.0;
 				H[n][n] = 1.0;
 				for (int i = n - 2; i >= 0; i--) {
-					double ra = 0.0;
-					double sa = 0.0;
+					double ra, sa, vr, vi;
+					ra = 0.0;
+					sa = 0.0;
 					for (int j = l; j <= n; j++) {
-						ra += H[i][j] * H[j][n - 1];
-						sa += H[i][j] * H[j][n];
+						ra = ra + H[i][j] * H[j][n - 1];
+						sa = sa + H[i][j] * H[j][n];
 					}
 					w = H[i][i] - p;
 
@@ -445,13 +477,11 @@ private:
 
 							x = H[i][i + 1];
 							y = H[i + 1][i];
-							double vr = (d[i] - p) * (d[i] - p) + e[i] * e[i]
-									- q * q;
-							double vi = (d[i] - p) * 2.0 * q;
-							if (vr == 0.0 && vi == 0.0) {
-								vr = eps * norm * (abs(w) + abs(q)
-										+ abs(x) + abs(y) + abs(
-										z));
+							vr = (d[i] - p) * (d[i] - p) + e[i] * e[i] - q * q;
+							vi = (d[i] - p) * 2.0 * q;
+							if (vr == 0.0 & vi == 0.0) {
+								vr = eps * norm * (abs(w) + abs(q) + abs(x)
+										+ abs(y) + abs(z));
 							}
 							cdiv(x * r - z * ra + q * sa,
 									x * s - z * sa - q * ra, vr, vi);
@@ -475,8 +505,8 @@ private:
 						t = max(abs(H[i][n - 1]), abs(H[i][n]));
 						if ((eps * t) * t > 1) {
 							for (int j = i; j <= n; j++) {
-								H[j][n - 1] /= t;
-								H[j][n] /= t;
+								H[j][n - 1] = H[j][n - 1] / t;
+								H[j][n] = H[j][n] / t;
 							}
 						}
 					}
@@ -485,27 +515,31 @@ private:
 		}
 
 		// Vectors of isolated roots
+
 		for (int i = 0; i < nn; i++) {
-			if (i < low || i > high) {
-				//System.arraycopy(H[i], i, V[i], i, nn - i);
-				memcpy(V[i], H[i], nn-i);
+			if (i < low | i > high) {
+				for (int j = i; j < nn; j++) {
+					V[i][j] = H[i][j];
+				}
 			}
 		}
 
 		// Back transformation to get eigenvectors of original matrix
+
 		for (int j = nn - 1; j >= low; j--) {
 			for (int i = low; i <= high; i++) {
 				z = 0.0;
 				for (int k = low; k <= min(j, high); k++) {
-					z += V[i][k] * H[k][j];
+					z = z + V[i][k] * H[k][j];
 				}
 				V[i][j] = z;
 			}
 		}
 	}
 
-	/** Nonsymmetric reduction to Hessenberg form. */
+	// Nonsymmetric reduction to Hessenberg form.
 	void orthes() {
+
 		//  This is derived from the Algol procedures orthes and ortran,
 		//  by Martin and Wilkinson, Handbook for Auto. Comp.,
 		//  Vol.ii-Linear Algebra, and the corresponding
@@ -519,7 +553,7 @@ private:
 
 			double scale = 0.0;
 			for (int i = m; i <= high; i++) {
-				scale += abs(H[i][m - 1]);
+				scale = scale + abs(H[i][m - 1]);
 			}
 			if (scale != 0.0) {
 
@@ -534,8 +568,8 @@ private:
 				if (ort[m] > 0) {
 					g = -g;
 				}
-				h -= ort[m] * g;
-				ort[m] -= g;
+				h = h - ort[m] * g;
+				ort[m] = ort[m] - g;
 
 				// Apply Householder similarity transformation
 				// H = (I-u*u'/h)*H*(I-u*u')/h)
@@ -545,7 +579,7 @@ private:
 					for (int i = high; i >= m; i--) {
 						f += ort[i] * H[i][j];
 					}
-					f /= h;
+					f = f / h;
 					for (int i = m; i <= high; i++) {
 						H[i][j] -= f * ort[i];
 					}
@@ -556,7 +590,7 @@ private:
 					for (int j = high; j >= m; j--) {
 						f += ort[j] * H[i][j];
 					}
-					f /= h;
+					f = f / h;
 					for (int j = m; j <= high; j++) {
 						H[i][j] -= f * ort[j];
 					}
@@ -595,30 +629,31 @@ private:
 	}
 
 public:
-	EigenvalueDecomposition() {}
+	EigenvalueDecomposition() {
+	}
 
-	EigenvalueDecomposition(Mat src) {
+	EigenvalueDecomposition(const Mat& src) {
 		this->n = src.cols;
-		V = alloc_2d<double>(n, n, 0.0);
-		d = alloc_1d<double>(n);
-		e = alloc_1d<double>(n);
-		H = alloc_2d<double>(n,n);
-		ort = alloc_1d<double>(n);
+		V = alloc_2d<double> (n, n, 0.0);
+		d = alloc_1d<double> (n);
+		e = alloc_1d<double> (n);
+		H = alloc_2d<double> (n, n);
+		ort = alloc_1d<double> (n);
 		// copy over the OpenCV data
-		for(int i=0; i<src.rows;i++) {
-			for(int j=0; j<src.cols;j++) {
-				H[i][j] = src.at<DataType>(i,j);
+		for (int i = 0; i < src.rows; i++) {
+			for (int j = 0; j < src.cols; j++) {
+				H[i][j] = src.at<DataType> (i, j);
 			}
 		}
-	    // Reduce to Hessenberg form.
-	    orthes();
-	    // Reduce Hessenberg to real Schur form.
-	    hqr2();
+		// Reduce to Hessenberg form.
+		orthes();
+		// Reduce Hessenberg to real Schur form.
+		hqr2();
 	}
 
 	~EigenvalueDecomposition() {
 		delete[] d, e, ort;
-		for(int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++) {
 			delete[] H[i];
 			delete[] V[i];
 		}
@@ -626,18 +661,18 @@ public:
 	}
 
 	Mat eigenvalues() {
-		Mat eigenvalues(1,n,CV_64FC1);
-		for(int i=0; i<n; i++) {
-			eigenvalues.at<double>(0,i) = d[i];
+		Mat eigenvalues(1, n, CV_64FC1);
+		for (int i = 0; i < n; i++) {
+			eigenvalues.at<double> (0, i) = d[i];
 		}
 		return eigenvalues;
 	}
 
 	Mat eigenvectors() {
-		Mat eigenvectors(n,n,CV_64FC1);
-		for(int i=0; i<n;i++)
-			for(int j=0; j<n;j++)
-				eigenvectors.at<double>(i,j) = V[i][j];
+		Mat eigenvectors(n, n, CV_64FC1);
+		for (int i = 0; i < n; i++)
+			for (int j = 0; j < n; j++)
+				eigenvectors.at<double> (i, j) = V[i][j];
 		return eigenvectors;
 	}
 };
