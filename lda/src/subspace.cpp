@@ -17,6 +17,7 @@
  */
 #include "eigen3/Eigen/Dense"
 #include <map>
+#include "decomposition.hpp"
 #include "subspace.hpp"
 #include "helper.hpp"
 
@@ -25,28 +26,42 @@ using namespace cv;
 
 //! computes Y = (X-mean)*W
 Mat subspace::project(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow) {
-	Mat data, X, Y;
+	// get number of samples and dimension
 	int n = dataAsRow ? src.rows : src.cols;
-	// convert to correct type
+	int d = dataAsRow ? src.cols : src.rows;
+	// assert mean has correct shape
+	if(d != mean.total())
+		CV_Error(CV_StsUnmatchedSizes, "The dimension of the samples in src must equal the dimension of the sample mean!");
+	// initalize temporary matrices
+	Mat data, X, Y;
+	// convert src data to correct type
 	src.convertTo(data, mean.type());
-	// center data (X-mean)
+	// center the data
 	subtract(dataAsRow ? data : transpose(data),
-			repeat(dataAsRow ? mean : transpose(mean), n, 1),
+			repeat(mean.reshape(1,1), n, 1),
 			X);
-	// Y = (X-mean)*W
+	// calculate projection as Y = (X-mean)*W
 	gemm(X, W, 1.0, Mat(), 0.0, Y);
 	return dataAsRow ? Y : transpose(Y);
 }
 
 //! X = Y*W'+mean
 Mat subspace::reconstruct(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow) {
-	Mat X;
-	// get number of samples
+	// get number of samples and dimension
 	int n = dataAsRow ? src.rows : src.cols;
-	gemm(dataAsRow ? src : transpose(src),
+	int d = dataAsRow ? src.cols : src.rows;
+	// assert mean has correct shape
+	if(d != mean.total())
+		CV_Error(CV_StsUnmatchedSizes, "The dimension of the samples in src must equal the dimension of the sample mean!");
+	// initalize temporary matrices
+	Mat data, X;
+	// convert src data to correct type
+	src.convertTo(data, mean.type());
+	// calculate the reconstruction X = Y*W + mean
+	gemm(dataAsRow ? data : transpose(data),
 			W,
 			1.0,
-			repeat(dataAsRow ? mean : transpose(mean), n, 1),
+			repeat(mean.reshape(1,1), n, 1),
 			1.0,
 			X,
 			GEMM_2_T);
@@ -125,6 +140,7 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	// M = inv(Sw)*Sb
 	Mat M;
 	gemm(Swi, Sb, 1.0, Mat(), 0.0, M);
+#if 0
 	// now switch to eigen (cv2eigen defined in helper.hpp)
 	MatrixXd Me;
 	cv2eigen(M, Me);
@@ -133,13 +149,20 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	// copy real values over to opencv
 	eigen2cv(MatrixXd(es.eigenvectors().real()), _eigenvectors);
 	eigen2cv(MatrixXd(es.eigenvalues().real()), _eigenvalues);
-	// get sorted indices descending by eigenvalue
+#else
+	EigenvalueDecomposition<double> es(M);
+	_eigenvalues = es.eigenvalues();
+	_eigenvectors = es.eigenvectors();
+#endif
+	// reshape eigenvalues, so they are stored by column
+	_eigenvalues = _eigenvalues.reshape(1,1);
+	// get sorted indices descending by their eigenvalue
 	vector<int> sorted_indices = argsort(_eigenvalues, false);
 	// now sort eigenvalues and eigenvectors accordingly
-	_eigenvalues = sortMatrixByRow(_eigenvalues, sorted_indices);
+	_eigenvalues = sortMatrixByColumn(_eigenvalues, sorted_indices);
 	_eigenvectors = sortMatrixByColumn(_eigenvectors, sorted_indices);
 	// and now take only the num_components and we're out!
-	_eigenvalues = Mat(_eigenvalues, Range(0,_num_components), Range::all());
+	_eigenvalues = Mat(_eigenvalues, Range::all(), Range(0,_num_components));
 	_eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
 }
 
