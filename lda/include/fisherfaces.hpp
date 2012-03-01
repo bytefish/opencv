@@ -15,7 +15,6 @@
  *
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
-
 #ifndef __FISHERFACES_HPP__
 #define __FISHERFACES_HPP__
 

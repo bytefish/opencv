@@ -21,25 +21,6 @@
 #include <set>
 using namespace cv;
 
-//! sort order for shuffle
-template<typename _Tp>
-class cv::SortByFirstAscending_ {
-public:
-	bool operator()(const std::pair<_Tp,int>& left, const std::pair<_Tp,int>& right) {
-		return left.first < right.first;
-	}
-};
-
-//! descending sort operator
-template<typename _Tp>
-class cv::SortByFirstDescending_ {
-public:
-	bool operator()(const std::pair<_Tp,int>& left, const std::pair<_Tp,int>& right) {
-		return left.first > right.first;
-	}
-};
-
-
 void cv::sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices) {
 	dst.create(src.rows, src.cols, src.type());
 	for(int idx = 0; idx < sorted_indices.size(); idx++) {
@@ -80,18 +61,18 @@ vector<int> cv::remove_dups(const vector<int>& src) {
 	return elems;
 }
 
-
-
-
 template<typename _Tp>
 vector<int> cv::argsort_(const Mat& src, bool asc) {
 	if(src.rows != 1 && src.cols != 1)
 		CV_Error(CV_StsBadArg, "Argsort only sorts 1D Vectors");
 	// <value>,<index>
 	vector< pair<_Tp,int> > val_indices;
-	for(int i = 0; i < src.rows; i++)
-		for(int j = 0; j < src.cols; j++)
+	for(int i = 0; i < src.rows; i++) {
+		for(int j = 0; j < src.cols; j++) {
 			val_indices.push_back(make_pair(src.at<_Tp>(i,j),val_indices.size()));
+		}
+	}
+
 	if(asc) {
 		std::sort(val_indices.begin(), val_indices.end(), SortByFirstAscending_<_Tp>());
 	} else {

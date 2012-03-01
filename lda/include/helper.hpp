@@ -27,14 +27,24 @@ using namespace std;
 
 namespace cv
 {
+
 //! sort order for shuffle
 template<typename _Tp>
-class SortByFirstAscending_;
+class SortByFirstAscending_ {
+public:
+	bool operator()(const std::pair<_Tp,int>& left, const std::pair<_Tp,int>& right) {
+		return left.first < right.first;
+	}
+};
 
 //! descending sort operator
 template<typename _Tp>
-class SortByFirstDescending_;
-
+class SortByFirstDescending_ {
+public:
+	bool operator()(const std::pair<_Tp,int>& left, const std::pair<_Tp,int>& right) {
+		return left.first > right.first;
+	}
+};
 void sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices);
 Mat sortMatrixByColumn(const Mat& src, vector<int> sorted_indices);
 
