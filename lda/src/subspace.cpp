@@ -20,10 +20,11 @@
 #include "helper.hpp"
 #ifdef HAVE_EIGEN
 #include "eigen3/Eigen/Dense"
+using namespace Eigen;
 #else
 #include "decomposition.hpp"
 #endif
-using namespace Eigen;
+
 using namespace cv;
 
 //! computes Y = (X-mean)*W
