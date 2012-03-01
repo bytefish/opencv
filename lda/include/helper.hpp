@@ -21,7 +21,6 @@
 
 #include "opencv/cxcore.h"
 #include <vector>
-#include <eigen3/Eigen/Dense>
 
 using namespace std;
 
