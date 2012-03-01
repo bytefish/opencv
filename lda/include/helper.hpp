@@ -21,6 +21,9 @@
 
 #include "opencv/cxcore.h"
 #include <vector>
+#ifdef HAVE_EIGEN
+#include <eigen3/Eigen/Dense>
+#endif
 
 using namespace std;
 
@@ -67,6 +70,7 @@ Mat transpose(const Mat& src);
 //! matlab equivalent num2str
 string num2str(int i);
 
+#ifdef HAVE_EIGEN
 template<typename _Tp, int _rows, int _cols, int _options, int _maxRows, int _maxCols>
 void eigen2cv( const Eigen::Matrix<_Tp, _rows, _cols, _options, _maxRows, _maxCols>& src, Mat& dst )
 {
@@ -194,7 +198,7 @@ void cv2eigen( const Mat& src,
         CV_DbgAssert(_dst.data == (uchar*)dst.data());
     }
 }
-
+#endif
 }
 
 #endif
