@@ -15,12 +15,14 @@
  *
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
-#include "eigen3/Eigen/Dense"
 #include <map>
-#include "decomposition.hpp"
 #include "subspace.hpp"
 #include "helper.hpp"
-
+#ifdef HAVE_EIGEN
+#include "eigen3/Eigen/Dense"
+#else
+#include "decomposition.hpp"
+#endif
 using namespace Eigen;
 using namespace cv;
 
