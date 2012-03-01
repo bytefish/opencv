@@ -22,7 +22,6 @@
 #include "helper.hpp"
 #include <limits>
 #include <cmath>
-#include <eigen3/Eigen/Dense>
 
 subspace::Fisherfaces::Fisherfaces(
 		const vector<Mat>& src,
