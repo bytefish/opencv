@@ -140,7 +140,7 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	// M = inv(Sw)*Sb
 	Mat M;
 	gemm(Swi, Sb, 1.0, Mat(), 0.0, M);
-#if 0
+#ifdef HAVE_EIGEN
 	// now switch to eigen (cv2eigen defined in helper.hpp)
 	MatrixXd Me;
 	cv2eigen(M, Me);
