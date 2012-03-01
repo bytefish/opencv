@@ -26,6 +26,7 @@
 #include "subspace.hpp"
 #include "fisherfaces.hpp"
 #include "helper.hpp"
+#include "decomposition.hpp"
 
 using namespace cv;
 using namespace std;
