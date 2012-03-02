@@ -153,7 +153,7 @@ void subspace::LinearDiscriminantAnalysis::compute(const Mat& src, const vector<
 	eigen2cv(MatrixXd(es.eigenvectors().real()), _eigenvectors);
 	eigen2cv(MatrixXd(es.eigenvalues().real()), _eigenvalues);
 #else
-	EigenvalueDecomposition<double> es(M);
+	EigenvalueDecomposition es(M);
 	_eigenvalues = es.eigenvalues();
 	_eigenvectors = es.eigenvectors();
 #endif

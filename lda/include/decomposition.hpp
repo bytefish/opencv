@@ -39,7 +39,7 @@ using namespace std;
  * other characteristic.
  *
  */
-template<typename DataType>
+
 class EigenvalueDecomposition {
 private:
 	int n;
@@ -628,30 +628,51 @@ private:
 		}
 	}
 
-public:
-	EigenvalueDecomposition() {
-	}
-
-	EigenvalueDecomposition(const Mat& src) {
-		this->n = src.cols;
+	void compute() {
+		// allocate temporary matrices
 		V = alloc_2d<double> (n, n, 0.0);
 		d = alloc_1d<double> (n);
 		e = alloc_1d<double> (n);
-		H = alloc_2d<double> (n, n);
 		ort = alloc_1d<double> (n);
-		// copy over the OpenCV data
-		for (int i = 0; i < src.rows; i++) {
-			for (int j = 0; j < src.cols; j++) {
-				H[i][j] = src.at<DataType> (i, j);
-			}
-		}
 		// Reduce to Hessenberg form.
 		orthes();
 		// Reduce Hessenberg to real Schur form.
 		hqr2();
 	}
 
+public:
+	EigenvalueDecomposition()
+	: n(0) { }
+
+	EigenvalueDecomposition(const Mat& src) : n(src.cols) {
+		compute(src);
+	}
+
+	template <typename _Tp>
+	EigenvalueDecomposition(const Mat_<_Tp>& src) : n(src.cols){
+		compute(src);
+	}
+
+	void compute(const Mat& src) {
+		compute(Mat_<double>(src));
+	}
+
+	template<typename _Tp>
+	void compute(const Mat_<_Tp>& src) {
+		// allocate the data to work on
+		H = alloc_2d<double> (n, n);
+		// now safely copy the data
+		for (int i = 0; i < src.rows; i++) {
+			for (int j = 0; j < src.cols; j++) {
+				H[i][j] = src(i, j);
+			}
+		}
+		// finally perform the eigenvalue decomposition of H
+		compute();
+	}
+
 	~EigenvalueDecomposition() {
+		// free some memory
 		delete[] d, e, ort;
 		for (int i = 0; i < n; i++) {
 			delete[] H[i];
