@@ -16,9 +16,9 @@
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
 
-#include <cv.h>
-#include <highgui.h>
-#include <highgui.h>
+#include "opencv2/opencv.hpp"
+#include "opencv2/highgui/highgui.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>

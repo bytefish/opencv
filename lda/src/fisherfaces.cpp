@@ -17,7 +17,6 @@
  */
 
 #include "fisherfaces.hpp"
-#include "cv.h"
 #include "subspace.hpp"
 #include "helper.hpp"
 #include <limits>

@@ -19,6 +19,7 @@
 #include "helper.hpp"
 #include <iostream>
 #include <set>
+
 using namespace cv;
 
 void cv::sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices) {

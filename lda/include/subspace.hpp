@@ -19,7 +19,7 @@
 #ifndef __SUBSPACE_HPP__
 #define __SUBSPACE_HPP__
 
-#include <cv.h>
+#include "opencv2/opencv.hpp"
 
 using namespace cv;
 

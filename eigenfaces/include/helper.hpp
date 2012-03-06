@@ -19,7 +19,7 @@
 #ifndef HELPER_HPP_
 #define HELPER_HPP_
 
-#include "cv.h"
+#include "opencv2/opencv.hpp"
 #include <vector>
 
 #include <string>

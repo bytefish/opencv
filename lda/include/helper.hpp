@@ -19,7 +19,7 @@
 #ifndef __HELPER_HPP__
 #define __HELPER_HPP__
 
-#include "opencv/cxcore.h"
+#include "opencv2/opencv.hpp"
 #include <vector>
 #ifdef HAVE_EIGEN
 #include <eigen3/Eigen/Dense>

@@ -19,7 +19,7 @@
 #ifndef EIGENFACES_HPP_
 #define EIGENFACES_HPP_
 
-#include <cv.h>
+#include "opencv2/opencv.hpp"
 #include <limits.h>
 #include <vector>
 
