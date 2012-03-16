@@ -1,3 +1,7 @@
+# Updates #
+
+Most of these projects have been reworked into [libfacerec](http://www.github.com/bytefish/libfacerec), which will probably be available in OpenCV 2.4 (contrib). You should really opt for [libfacerec](http://www.github.com/bytefish/libfacerec), because it comes with unit tests and is updated on a regular basis.
+
 # bytefish/opencv #
 
 This repository contains OpenCV code and documents.
@@ -51,7 +55,6 @@ Basic code for spatial histograms and histogram matching with a chi-square dista
 
   * http://www.bytefish.de/blog/local_binary_patterns
   * http://www.bytefish.de/wiki/python/numpy/performance
-  
   
 ## lda ##
 
