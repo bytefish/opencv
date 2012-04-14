@@ -1,6 +1,8 @@
-# Updates #
+# Update #
 
-Most of these projects have been reworked into [libfacerec](http://www.github.com/bytefish/libfacerec), which will probably be available in OpenCV 2.4 (contrib). You should really opt for [libfacerec](http://www.github.com/bytefish/libfacerec), because it comes with unit tests and is updated on a regular basis.
+Most of these projects have been reworked into [libfacerec](http://www.github.com/bytefish/libfacerec), which will probably be available in OpenCV 2.4 (contrib). [libfacerec](http://www.github.com/bytefish/libfacerec) comes with unit tested algorithms for Eigenfaces, Fisherfaces and Local Binary Patterns Histograms. It compiles fine for OpenCV 2.3.1 on Windows and Linux and comes with an extensive documentation (API and tutorials).
+
+I leave these projects here for an educational purpose, because they might be interesting to someone. However, I can't give any support on these projects anymore, as there are supported and tested versions of these algorithms in [libfacerec](http://www.github.com/bytefish/libfacerec). That's why I disabled the issue tracker for this project.
 
 # bytefish/opencv #
 
