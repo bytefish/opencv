@@ -1,8 +1,15 @@
-# Update #
+# NOTICE #
 
-Most of these projects have been reworked into [libfacerec](http://www.github.com/bytefish/libfacerec), which will probably be available in OpenCV 2.4 (contrib). [libfacerec](http://www.github.com/bytefish/libfacerec) comes with unit tested algorithms for Eigenfaces, Fisherfaces and Local Binary Patterns Histograms. It compiles fine for OpenCV 2.3.1 on Windows and Linux and comes with an extensive documentation (API and tutorials).
+These projects have been reworked into [libfacerec](http://www.github.com/bytefish/libfacerec), which is also available in OpenCV 2.4 (contrib module, slight changes to fit into the OpenCV API). [libfacerec](http://www.github.com/bytefish/libfacerec) comes with unit tested algorithms for Eigenfaces, Fisherfaces and Local Binary Patterns Histograms and contains a lot of fixes for the algorithms. It compiles fine for OpenCV 2.3.1 on Windows and Linux and comes with an extensive documentation (API and tutorials), so you should really *consider it*.
 
-I leave these projects here for an educational purpose, because they might be interesting to someone. However, I can't give any support on these projects anymore, as there are supported and tested versions of these algorithms in [libfacerec](http://www.github.com/bytefish/libfacerec). That's why I disabled the issue tracker for this project.
+I leave these projects here just for an educational purpose, because they might be interesting to someone. However, I can't give any support on these projects, because I provide unit tested versions of these algorithms in [libfacerec](http://www.github.com/bytefish/libfacerec) and I am only able to support one implementation. That's why I disabled the issue tracker for this project. 
+
+If you want to learn the basics of Eigenfaces and Fisherfaces, please start with my guide on face recognition:
+
+  * http://bytefish.de/pdf/facerec_python.pdf (Python, C++)
+  * http://bytefish.de/pdf/facerec_octave.pdf (GNU Octave/MATLAB, C++)
+  
+It explains the basics and comes with source code in C++, Python and GNU Octave/Matlab.
 
 # bytefish/opencv #
 
