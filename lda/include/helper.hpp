@@ -50,7 +50,7 @@ namespace cv {
 //      bool symmetric = isSymmetric(mSymmetric); // true
 //      bool not_symmetric = isSymmetric(mNonSymmetric); // false
 //
-bool isSymmetric(InputArray src, double eps = 1E-16);
+bool isSymmetric(const Mat& src, double eps = 1E-16);
 
 // Sorts a 1D Matrix by given sort order and returns the sorted indices.
 // This is just a wrapper to simplify cv::sortIdx:
@@ -61,32 +61,32 @@ bool isSymmetric(InputArray src, double eps = 1E-16);
 //      // make a conversion to vector<int>
 //      vector<int> sorted_indices = cv::argsort(mNotSorted, true);
 //
-Mat argsort(InputArray src, bool ascending = true);
+vector<int> argsort(const Mat& src, bool ascending = true);
 
 // Sorts a given matrix src by column for given indices.
 //
 // Note: create is called on dst.
-void sortMatrixColumnsByIndices(InputArray src, InputArray indices, OutputArray dst);
+void sortMatrixColumnsByIndices(const Mat& src, const vector<int>& indices, Mat& dst);
 
 // Sorts a given matrix src by row for given indices.
-Mat sortMatrixColumnsByIndices(InputArray src, InputArray indices);
+Mat sortMatrixColumnsByIndices(const Mat& src, const vector<int>& indices);
 
 // Sorts a given matrix src by row for given indices.
 //
 // Note: create is called on dst.
-void sortMatrixRowsByIndices(InputArray src, InputArray indices, OutputArray dst);
+void sortMatrixRowsByIndices(const Mat& src, const vector<int>& indices, Mat& dst);
 
 // Sorts a given matrix src by row for given indices.
-Mat sortMatrixRowsByIndices(InputArray src, InputArray indices);
+Mat sortMatrixRowsByIndices(const Mat& src, const vector<int>& indices);
 
 // Turns a vector of matrices into a row matrix.
-Mat asRowMatrix(InputArrayOfArrays src, int rtype, double alpha=1, double beta=0);
+Mat asRowMatrix(const vector<Mat>& src, int rtype, double alpha=1, double beta=0);
 
 // Turns a given matrix into its grayscale representation.
-Mat toGrayscale(InputArray src, int dtype = CV_8UC1);
+Mat toGrayscale(const Mat& src, int dtype = CV_8UC1);
 
 // Transposes a matrix.
-Mat transpose(InputArray src);
+Mat transpose(const Mat& src);
 
 }
 

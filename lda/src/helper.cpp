@@ -26,14 +26,13 @@ using namespace cv;
 namespace cv {
 
 template<typename _Tp> static bool
-isSymmetric_(InputArray src) {
-    Mat _src = src.getMat();
-    if(_src.cols != _src.rows)
+isSymmetric_(const Mat& src) {
+    if(src.cols != src.rows)
         return false;
-    for (int i = 0; i < _src.rows; i++) {
-        for (int j = 0; j < _src.cols; j++) {
-            _Tp a = _src.at<_Tp> (i, j);
-            _Tp b = _src.at<_Tp> (j, i);
+    for (int i = 0; i < src.rows; i++) {
+        for (int j = 0; j < src.cols; j++) {
+            _Tp a = src.at<_Tp> (i, j);
+            _Tp b = src.at<_Tp> (j, i);
             if (a != b) {
                 return false;
             }
@@ -43,14 +42,13 @@ isSymmetric_(InputArray src) {
 }
 
 template<typename _Tp> static bool
-isSymmetric_(InputArray src, double eps) {
-    Mat _src = src.getMat();
-    if(_src.cols != _src.rows)
+isSymmetric_(const Mat& src, double eps) {
+    if(src.cols != src.rows)
         return false;
-    for (int i = 0; i < _src.rows; i++) {
-        for (int j = 0; j < _src.cols; j++) {
-            _Tp a = _src.at<_Tp> (i, j);
-            _Tp b = _src.at<_Tp> (j, i);
+    for (int i = 0; i < src.rows; i++) {
+        for (int j = 0; j < src.cols; j++) {
+            _Tp a = src.at<_Tp> (i, j);
+            _Tp b = src.at<_Tp> (j, i);
             if (std::abs(a - b) > eps) {
                 return false;
             }
@@ -61,8 +59,7 @@ isSymmetric_(InputArray src, double eps) {
 
 }
 
-bool cv::isSymmetric(InputArray src, double eps) {
-    Mat m = src.getMat();
+bool cv::isSymmetric(const Mat& m, double eps) {
     switch (m.type()) {
     case CV_8SC1: return isSymmetric_<char>(m); break;
     case CV_8UC1:
@@ -86,14 +83,13 @@ bool cv::isSymmetric(InputArray src, double eps) {
 //------------------------------------------------------------------------------
 // cv::argsort
 //------------------------------------------------------------------------------
-Mat cv::argsort(InputArray _src, bool ascending) {
-    Mat src = _src.getMat();
+vector<int> cv::argsort(const Mat& src, bool ascending) {
     if (src.rows != 1 && src.cols != 1) {
         CV_Error(CV_StsBadArg, "cv::argsort only sorts 1D matrices.");
     }
     int flags = CV_SORT_EVERY_ROW+(ascending ? CV_SORT_ASCENDING : CV_SORT_DESCENDING);
-    Mat sorted_indices;
-    cv::sortIdx(src.reshape(1,1),sorted_indices,flags);
+    vector<int> sorted_indices;
+    cv::sortIdx(src.reshape(1,1), sorted_indices, flags);
     return sorted_indices;
 }
 
@@ -101,15 +97,8 @@ Mat cv::argsort(InputArray _src, bool ascending) {
 // cv::sortMatrixColumnsByIndices
 //------------------------------------------------------------------------------
 
-void cv::sortMatrixColumnsByIndices(InputArray _src, InputArray _indices, OutputArray _dst) {
-    if(_indices.getMat().type() != CV_32SC1) {
-        string error_message = format("cv::sortRowsByIndices only works on integer indices! Expected: %d. Given: %d.", CV_32SC1, _indices.getMat().type());
-        CV_Error(CV_StsBadArg, error_message);
-    }
-    Mat src = _src.getMat();
-    vector<int> indices = _indices.getMat();
-    _dst.create(src.rows, src.cols, src.type());
-    Mat dst = _dst.getMat();
+void cv::sortMatrixColumnsByIndices(const Mat& src, const vector<int>& indices, Mat& dst) {
+    dst.create(src.rows, src.cols, src.type());
     for(int idx = 0; idx < indices.size(); idx++) {
         Mat originalCol = src.col(indices[idx]);
         Mat sortedCol = dst.col(idx);
@@ -117,7 +106,7 @@ void cv::sortMatrixColumnsByIndices(InputArray _src, InputArray _indices, Output
     }
 }
 
-Mat cv::sortMatrixColumnsByIndices(InputArray src, InputArray indices) {
+Mat cv::sortMatrixColumnsByIndices(const Mat&  src, const vector<int>& indices) {
     Mat dst;
     sortMatrixColumnsByIndices(src, indices, dst);
     return dst;
@@ -126,15 +115,8 @@ Mat cv::sortMatrixColumnsByIndices(InputArray src, InputArray indices) {
 //------------------------------------------------------------------------------
 // cv::sortMatrixRowsByIndices
 //------------------------------------------------------------------------------
-void cv::sortMatrixRowsByIndices(InputArray _src, InputArray _indices, OutputArray _dst) {
-    if(_indices.getMat().type() != CV_32SC1) {
-        string error_message = format("cv::sortRowsByIndices only works on integer indices! Expected: %d. Given: %d.", CV_32SC1, _indices.getMat().type());
-        CV_Error(CV_StsBadArg, error_message);
-    }
-    Mat src = _src.getMat();
-    vector<int> indices = _indices.getMat();
-    _dst.create(src.rows, src.cols, src.type());
-    Mat dst = _dst.getMat();
+void cv::sortMatrixRowsByIndices(const Mat& src, const vector<int>& indices, Mat& dst) {
+    dst.create(src.rows, src.cols, src.type());
     for(int idx = 0; idx < indices.size(); idx++) {
         Mat originalRow = src.row(indices[idx]);
         Mat sortedRow = dst.row(idx);
@@ -142,7 +124,7 @@ void cv::sortMatrixRowsByIndices(InputArray _src, InputArray _indices, OutputArr
     }
 }
 
-Mat cv::sortMatrixRowsByIndices(InputArray src, InputArray indices) {
+Mat cv::sortMatrixRowsByIndices(const Mat& src, const vector<int>& indices) {
    Mat dst;
    sortMatrixRowsByIndices(src, indices, dst);
    return dst;
@@ -151,34 +133,30 @@ Mat cv::sortMatrixRowsByIndices(InputArray src, InputArray indices) {
 //------------------------------------------------------------------------------
 // cv::asRowMatrix
 //------------------------------------------------------------------------------
-Mat cv::asRowMatrix(InputArrayOfArrays src, int rtype, double alpha, double beta) {
-    // make sure the input data is a vector of matrices or vector of vector
-    if(src.kind() != _InputArray::STD_VECTOR_MAT && src.kind() != _InputArray::STD_VECTOR_VECTOR) {
-        CV_Error(CV_StsBadArg, "The data is expected as InputArray::STD_VECTOR_MAT (a std::vector<Mat>) or _InputArray::STD_VECTOR_VECTOR (a std::vector< vector<...> >).");
-    }
+Mat cv::asRowMatrix(const vector<Mat>& src, int rtype, double alpha, double beta) {
     // number of samples
-    size_t n = src.total();
+    size_t n = src.size();
     // return empty matrix if no matrices given
     if(n == 0)
         return Mat();
     // dimensionality of (reshaped) samples
-    size_t d = src.getMat(0).total();
+    size_t d = src[0].total();
     // create data matrix
     Mat data(n, d, rtype);
     // now copy data
     for(int i = 0; i < n; i++) {
         // make sure data can be reshaped, throw exception if not!
-        if(src.getMat(i).total() != d) {
-            string error_message = format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, d, src.getMat(i).total());
+        if(src[i].total() != d) {
+            string error_message = format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, d, src[i].total());
             CV_Error(CV_StsBadArg, error_message);
         }
         // get a hold of the current row
         Mat xi = data.row(i);
         // make reshape happy by cloning for non-continuous matrices
-        if(src.getMat(i).isContinuous()) {
-            src.getMat(i).reshape(1, 1).convertTo(xi, rtype, alpha, beta);
+        if(src[i].isContinuous()) {
+            src[i].reshape(1, 1).convertTo(xi, rtype, alpha, beta);
         } else {
-            src.getMat(i).clone().reshape(1, 1).convertTo(xi, rtype, alpha, beta);
+            src[i].clone().reshape(1, 1).convertTo(xi, rtype, alpha, beta);
         }
     }
     return data;
@@ -187,8 +165,7 @@ Mat cv::asRowMatrix(InputArrayOfArrays src, int rtype, double alpha, double beta
 //------------------------------------------------------------------------------
 // cv::toGrayscale
 //------------------------------------------------------------------------------
-Mat cv::toGrayscale(InputArray _src, int dtype) {
-    Mat src = _src.getMat();
+Mat cv::toGrayscale(const Mat& src, int dtype) {
     // only allow one channel
     if(src.channels() != 1) {
         string error_message = format("Only Matrices with one channel are supported. Expected 1, but was %d.", src.channels());
@@ -196,15 +173,14 @@ Mat cv::toGrayscale(InputArray _src, int dtype) {
     }
     // create and return normalized image
     Mat dst;
-    cv::normalize(_src, dst, 0, 255, NORM_MINMAX, CV_8UC1);
+    cv::normalize(src, dst, 0, 255, NORM_MINMAX, CV_8UC1);
     return dst;
 }
 
 //------------------------------------------------------------------------------
 // cv::transpose
 //------------------------------------------------------------------------------
-Mat cv::transpose(InputArray _src) {
-    Mat src = _src.getMat();
+Mat cv::transpose(const Mat& src) {
     Mat dst;
     transpose(src, dst);
     return dst;
