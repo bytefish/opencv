@@ -26,9 +26,9 @@ using namespace cv;
 namespace subspace {
 
 //! project samples into W
-Mat project(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow = true);
+Mat project(const Mat& W, const Mat& mean, const Mat& src);
 //! reconstruct samples into W
-Mat reconstruct(const Mat& W, const Mat& mean, const Mat& src, bool dataAsRow = true);
+Mat reconstruct(const Mat& W, const Mat& mean, const Mat& src);
 
 using namespace cv;
 using namespace std;
@@ -37,7 +37,7 @@ using namespace std;
 class LinearDiscriminantAnalysis {
 
 private:
-	bool _dataAsRow;
+
 	int _num_components;
 	Mat _eigenvectors;
 	Mat _eigenvalues;
@@ -46,30 +46,25 @@ public:
 
 	//! initialize with 0 components and data given in rows
 	LinearDiscriminantAnalysis() :
-		_num_components(0),
-		_dataAsRow(true) {};
+		_num_components(0){};
 
 	//! initialize with num_components and specify how observations are given
-	LinearDiscriminantAnalysis(int num_components, bool dataAsRow = true) :
-		_num_components(num_components),
-		_dataAsRow(dataAsRow) {};
+	LinearDiscriminantAnalysis(int num_components) :
+		_num_components(num_components) {};
+
 	//! initialize and perform a discriminant analysis with given data in src and labels
 	LinearDiscriminantAnalysis(const Mat& src,
 			const vector<int>& labels,
-			int num_components = 0,
-			bool dataAsRow = true) :
-				_num_components(num_components),
-				_dataAsRow(dataAsRow)
+			int num_components = 0) :
+				_num_components(num_components)
 	{
 		this->compute(src, labels); //! compute eigenvectors and eigenvalues
 	}
 	//! initialize and perform a discriminant analysis with given data in src and labels
 	LinearDiscriminantAnalysis(const vector<Mat>& src,
 			const vector<int>& labels,
-			int num_components = 0,
-			bool dataAsRow = true) :
-				_num_components(num_components),
-				_dataAsRow(dataAsRow)
+			int num_components = 0) :
+				_num_components(num_components)
 	{
 		this->compute(src, labels); //! compute eigenvectors and eigenvalues
 	}

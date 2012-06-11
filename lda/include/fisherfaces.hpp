@@ -34,11 +34,14 @@ namespace subspace {
 class Fisherfaces {
 
 private:
-	bool _dataAsRow;
+
 	int _num_components;
+	double _threshold;
+
 	Mat _eigenvectors;
 	Mat _eigenvalues;
 	Mat _mean;
+
 	vector<Mat> _projections;
 	vector<int> _labels;
 
@@ -46,39 +49,34 @@ public:
 
 	Fisherfaces() :
 		_num_components(0),
-		_dataAsRow(true) {};
+		_threshold(DBL_MAX) {};
 
-	Fisherfaces(int num_components, bool dataAsRow = true) :
-		_num_components(num_components),
-		_dataAsRow(dataAsRow) {};
+	Fisherfaces(int num_components, double threshold = DBL_MAX) :
+        _num_components(num_components),
+        _threshold(threshold) {};
 
 	Fisherfaces(const vector<Mat>& src,
 			const vector<int>& labels,
 			int num_components = 0,
-			bool dataAsRow = true);
-
-
-	Fisherfaces(const Mat& src,
-			const vector<int>& labels,
-			int num_components = 0,
-			bool dataAsRow = true) :
-				_num_components(num_components),
-				_dataAsRow(dataAsRow)
+			double threshold = DBL_MAX) :
+			    _num_components(num_components),
+			    _threshold(threshold)
 	{
-		compute(src, labels);
+	    compute(src, labels);
 	}
+
 
 	~Fisherfaces() {}
 
-	//! compute the discriminants for data in src and labels
-	void compute(const Mat& src, const vector<int>& labels);
-	//! compute the discriminants for data in src and labels
+	// compute the discriminants for data in src and labels
 	void compute(const vector<Mat>& src, const vector<int>& labels);
 	// returns the nearest neighbor to a query
 	int predict(const Mat& src);
-	//! project samples
+	// returns the nearest neighbor to a query and confidence for this prediction
+	void predict(const Mat& src, int &label, double &confidence);
+	// project samples
 	Mat project(const Mat& src);
-	//! reconstruct samples
+	// reconstruct samples
 	Mat reconstruct(const Mat& src);
 	// returns a const reference to the eigenvectors of this LDA
 	Mat eigenvectors() const { return _eigenvectors; };
@@ -86,6 +84,9 @@ public:
 	Mat eigenvalues() const { return _eigenvalues; }
 	// returns a const reference to the eigenvalues of this LDA
 	Mat mean() const { return _eigenvalues; }
+
+	void setThreshold(double threshold) { _threshold = threshold; }
+	double getThreshold() const { return _threshold; }
 };
 }
 #endif

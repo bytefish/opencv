@@ -21,184 +21,73 @@
 
 #include "opencv2/opencv.hpp"
 #include <vector>
-#ifdef HAVE_EIGEN
-#include <eigen3/Eigen/Dense>
-#endif
+#include <set>
 
 using namespace std;
 
-namespace cv
-{
-
-//! sort order for shuffle
+// Removes duplicate elements in a given vector.
 template<typename _Tp>
-class SortByFirstAscending_ {
-public:
-	bool operator()(const std::pair<_Tp,int>& left, const std::pair<_Tp,int>& right) {
-		return left.first < right.first;
-	}
-};
-
-//! descending sort operator
-template<typename _Tp>
-class SortByFirstDescending_ {
-public:
-	bool operator()(const std::pair<_Tp,int>& left, const std::pair<_Tp,int>& right) {
-		return left.first > right.first;
-	}
-};
-void sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices);
-Mat sortMatrixByColumn(const Mat& src, vector<int> sorted_indices);
-
-void sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices);
-Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
-
-template<typename _Tp>
-vector<int> argsort_(const Mat& src, bool sortAscending=true);
-vector<int> argsort(const Mat& src, bool sortAscending=true);
-
-vector<int> remove_dups(const vector<int>& src);
-
-//! turns a vector of matrices into a row matrix
-Mat asRowMatrix(const vector<Mat>& src);
-//! turns a vector of matrices into a column matrix
-Mat asColumnMatrix(const vector<Mat>& src);
-//! turns a one-channel matrix into a grayscale representation
-Mat toGrayscale(const Mat& src);
-//! transposes a matrix
-Mat transpose(const Mat& src);
-//! matlab equivalent num2str
-string num2str(int i);
-
-#ifdef HAVE_EIGEN
-template<typename _Tp, int _rows, int _cols, int _options, int _maxRows, int _maxCols>
-void eigen2cv( const Eigen::Matrix<_Tp, _rows, _cols, _options, _maxRows, _maxCols>& src, Mat& dst )
-{
-    if( !(src.Flags & Eigen::RowMajorBit) )
-    {
-        Mat _src(src.cols(), src.rows(), DataType<_Tp>::type,
-              (void*)src.data(), src.stride()*sizeof(_Tp));
-        transpose(_src, dst);
-    }
-    else
-    {
-        Mat _src(src.rows(), src.cols(), DataType<_Tp>::type,
-                 (void*)src.data(), src.stride()*sizeof(_Tp));
-        _src.copyTo(dst);
-    }
+inline vector<_Tp> remove_dups(const vector<_Tp>& src) {
+    typedef typename set<_Tp>::const_iterator constSetIterator;
+    typedef typename vector<_Tp>::const_iterator constVecIterator;
+    set<_Tp> set_elems;
+    for (constVecIterator it = src.begin(); it != src.end(); ++it)
+        set_elems.insert(*it);
+    vector<_Tp> elems;
+    for (constSetIterator it = set_elems.begin(); it != set_elems.end(); ++it)
+        elems.push_back(*it);
+    return elems;
 }
 
-template<typename _Tp, int _rows, int _cols, int _options, int _maxRows, int _maxCols>
-void cv2eigen( const Mat& src,
-               Eigen::Matrix<_Tp, _rows, _cols, _options, _maxRows, _maxCols>& dst )
-{
-    CV_DbgAssert(src.rows == _rows && src.cols == _cols);
-    if( !(dst.Flags & Eigen::RowMajorBit) )
-    {
-        Mat _dst(src.cols, src.rows, DataType<_Tp>::type,
-                 dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        if( src.type() == _dst.type() )
-            transpose(src, _dst);
-        else if( src.cols == src.rows )
-        {
-            src.convertTo(_dst, _dst.type());
-            transpose(_dst, _dst);
-        }
-        else
-            Mat(src.t()).convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-    else
-    {
-        Mat _dst(src.rows, src.cols, DataType<_Tp>::type,
-                 dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        src.convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-}
+// The namespace cv provides opencv related helper functions.
+namespace cv {
 
-template<typename _Tp>
-void cv2eigen( const Mat& src,
-               Eigen::Matrix<_Tp, Eigen::Dynamic, Eigen::Dynamic>& dst )
-{
-    dst.resize(src.rows, src.cols);
-    if( !(dst.Flags & Eigen::RowMajorBit) )
-    {
-        Mat _dst(src.cols, src.rows, DataType<_Tp>::type,
-             dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        if( src.type() == _dst.type() )
-            transpose(src, _dst);
-        else if( src.cols == src.rows )
-        {
-            src.convertTo(_dst, _dst.type());
-            transpose(_dst, _dst);
-        }
-        else
-            Mat(src.t()).convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-    else
-    {
-        Mat _dst(src.rows, src.cols, DataType<_Tp>::type,
-                 dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        src.convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-}
+// Checks if a given matrix is symmetric, with an epsilon for floating point
+// matrices (1E-16 by default).
+//
+//      Mat mSymmetric = (Mat_<double>(2,2) << 1, 2, 2, 1);
+//      Mat mNonSymmetric = (Mat_<double>(2,2) << 1, 2, 3, 4);
+//      bool symmetric = isSymmetric(mSymmetric); // true
+//      bool not_symmetric = isSymmetric(mNonSymmetric); // false
+//
+bool isSymmetric(InputArray src, double eps = 1E-16);
 
+// Sorts a 1D Matrix by given sort order and returns the sorted indices.
+// This is just a wrapper to simplify cv::sortIdx:
+//
+//      Mat mNotSorted = (Mat_<double>(1,4) << 1.0, 0.0, 3.0, -1.0);
+//      // to sort the vector use
+//      Mat sorted_indices = cv::argsort(mNotSorted, true);
+//      // make a conversion to vector<int>
+//      vector<int> sorted_indices = cv::argsort(mNotSorted, true);
+//
+Mat argsort(InputArray src, bool ascending = true);
 
-template<typename _Tp>
-void cv2eigen( const Mat& src,
-               Eigen::Matrix<_Tp, Eigen::Dynamic, 1>& dst )
-{
-    CV_Assert(src.cols == 1);
-    dst.resize(src.rows);
+// Sorts a given matrix src by column for given indices.
+//
+// Note: create is called on dst.
+void sortMatrixColumnsByIndices(InputArray src, InputArray indices, OutputArray dst);
 
-    if( !(dst.Flags & Eigen::RowMajorBit) )
-    {
-        Mat _dst(src.cols, src.rows, DataType<_Tp>::type,
-                 dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        if( src.type() == _dst.type() )
-            transpose(src, _dst);
-        else
-            Mat(src.t()).convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-    else
-    {
-        Mat _dst(src.rows, src.cols, DataType<_Tp>::type,
-                 dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        src.convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-}
+// Sorts a given matrix src by row for given indices.
+Mat sortMatrixColumnsByIndices(InputArray src, InputArray indices);
 
+// Sorts a given matrix src by row for given indices.
+//
+// Note: create is called on dst.
+void sortMatrixRowsByIndices(InputArray src, InputArray indices, OutputArray dst);
 
-template<typename _Tp>
-void cv2eigen( const Mat& src,
-               Eigen::Matrix<_Tp, 1, Eigen::Dynamic>& dst )
-{
-    CV_Assert(src.rows == 1);
-    dst.resize(src.cols);
-    if( !(dst.Flags & Eigen::RowMajorBit) )
-    {
-        Mat _dst(src.cols, src.rows, DataType<_Tp>::type,
-                 dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        if( src.type() == _dst.type() )
-            transpose(src, _dst);
-        else
-            Mat(src.t()).convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-    else
-    {
-        Mat _dst(src.rows, src.cols, DataType<_Tp>::type,
-                 dst.data(), (size_t)(dst.stride()*sizeof(_Tp)));
-        src.convertTo(_dst, _dst.type());
-        CV_DbgAssert(_dst.data == (uchar*)dst.data());
-    }
-}
-#endif
+// Sorts a given matrix src by row for given indices.
+Mat sortMatrixRowsByIndices(InputArray src, InputArray indices);
+
+// Turns a vector of matrices into a row matrix.
+Mat asRowMatrix(InputArrayOfArrays src, int rtype, double alpha=1, double beta=0);
+
+// Turns a given matrix into its grayscale representation.
+Mat toGrayscale(InputArray src, int dtype = CV_8UC1);
+
+// Transposes a matrix.
+Mat transpose(InputArray src);
+
 }
 
 #endif

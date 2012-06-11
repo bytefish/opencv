@@ -43,9 +43,11 @@ void read_csv(const string& filename, vector<Mat>& images, vector<int>& labels) 
 		// split line
 		std::getline(liness, path, ';');
 		std::getline(liness, classlabel);
-		// push pack the data
-		images.push_back(imread(path,0));
-		labels.push_back(atoi(classlabel.c_str()));
+		// push pack the data if any
+        if(!path.empty() && !classlabel.empty()) {
+            images.push_back(imread(path, 0));
+            labels.push_back(atoi(classlabel.c_str()));
+        }
 	}
 }
 
@@ -139,7 +141,7 @@ int main(int argc, const char *argv[]) {
 	// show first 10 fisherfaces
 	for(int i = 0; i < min(10,W.cols); i++) {
 		Mat ev = W.col(i).clone();
-		imshow(num2str(i), toGrayscale(ev.reshape(1, height)));
+		imshow(format("%d",i), toGrayscale(ev.reshape(1, height)));
 	}
 	waitKey(0);
 	return 0;
