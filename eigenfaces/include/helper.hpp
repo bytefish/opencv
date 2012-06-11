@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012. Philipp Wagner <bytefish[at]gmx[dot]de>.
+ * Copyright (c) 2011. Philipp Wagner <bytefish[at]gmx[dot]de>.
  * Released to public domain under terms of the BSD Simplified license.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -16,43 +16,78 @@
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
 
-#ifndef HELPER_HPP_
-#define HELPER_HPP_
+#ifndef __HELPER_HPP__
+#define __HELPER_HPP__
 
 #include "opencv2/opencv.hpp"
 #include <vector>
-
-#include <string>
-#include <sstream>
+#include <set>
 
 using namespace std;
 
-namespace cv
-{
-//! matlab equivalent num2str
-string num2str(int i);
-//! templated sort operator
+// Removes duplicate elements in a given vector.
 template<typename _Tp>
-class SortByFirstAscending_;
-//! descending sort operator
-template<typename _Tp>
-class SortByFirstDescending_;
-//! sorts a matrix by column for given indices
-void sortMatrixByColumn(const Mat& src, Mat& dst, vector<int> sorted_indices);
-//! sorts a matrix by column for given indices
-Mat sortMatrixByColumn(const Mat& src, vector<int> sorted_indices);
-//! sorts a matrix by row for given indices
-void sortMatrixByRow(const Mat& src, Mat& dst, vector<int> sorted_indices);
-//! sorts a matrix by row for given indices
-Mat sortMatrixByRow(const Mat& src, vector<int> sorted_indices);
-//! turns a vector of matrices into a row matrix
-Mat asRowMatrix(const vector<Mat>& src, int type = CV_32FC1);
-//! turns a vector of matrices into a column matrix
-Mat asColumnMatrix(const vector<Mat>& src, int type = CV_32FC1);
-//! turns a one-channel matrix into a grayscale representation
-Mat toGrayscale(const Mat& src);
-//! transposes a matrix
+inline vector<_Tp> remove_dups(const vector<_Tp>& src) {
+    typedef typename set<_Tp>::const_iterator constSetIterator;
+    typedef typename vector<_Tp>::const_iterator constVecIterator;
+    set<_Tp> set_elems;
+    for (constVecIterator it = src.begin(); it != src.end(); ++it)
+        set_elems.insert(*it);
+    vector<_Tp> elems;
+    for (constSetIterator it = set_elems.begin(); it != set_elems.end(); ++it)
+        elems.push_back(*it);
+    return elems;
+}
+
+// The namespace cv provides opencv related helper functions.
+namespace cv {
+
+// Checks if a given matrix is symmetric, with an epsilon for floating point
+// matrices (1E-16 by default).
+//
+//      Mat mSymmetric = (Mat_<double>(2,2) << 1, 2, 2, 1);
+//      Mat mNonSymmetric = (Mat_<double>(2,2) << 1, 2, 3, 4);
+//      bool symmetric = isSymmetric(mSymmetric); // true
+//      bool not_symmetric = isSymmetric(mNonSymmetric); // false
+//
+bool isSymmetric(const Mat& src, double eps = 1E-16);
+
+// Sorts a 1D Matrix by given sort order and returns the sorted indices.
+// This is just a wrapper to simplify cv::sortIdx:
+//
+//      Mat mNotSorted = (Mat_<double>(1,4) << 1.0, 0.0, 3.0, -1.0);
+//      // to sort the vector use
+//      Mat sorted_indices = cv::argsort(mNotSorted, true);
+//      // make a conversion to vector<int>
+//      vector<int> sorted_indices = cv::argsort(mNotSorted, true);
+//
+vector<int> argsort(const Mat& src, bool ascending = true);
+
+// Sorts a given matrix src by column for given indices.
+//
+// Note: create is called on dst.
+void sortMatrixColumnsByIndices(const Mat& src, const vector<int>& indices, Mat& dst);
+
+// Sorts a given matrix src by row for given indices.
+Mat sortMatrixColumnsByIndices(const Mat& src, const vector<int>& indices);
+
+// Sorts a given matrix src by row for given indices.
+//
+// Note: create is called on dst.
+void sortMatrixRowsByIndices(const Mat& src, const vector<int>& indices, Mat& dst);
+
+// Sorts a given matrix src by row for given indices.
+Mat sortMatrixRowsByIndices(const Mat& src, const vector<int>& indices);
+
+// Turns a vector of matrices into a row matrix.
+Mat asRowMatrix(const vector<Mat>& src, int rtype, double alpha=1, double beta=0);
+
+// Turns a given matrix into its grayscale representation.
+Mat toGrayscale(const Mat& src, int dtype = CV_8UC1);
+
+// Transposes a matrix.
 Mat transpose(const Mat& src);
+
 }
 
 #endif

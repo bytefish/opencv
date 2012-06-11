@@ -28,8 +28,8 @@ using namespace cv;
 
 class Eigenfaces {
 private:
-	bool _dataAsRow;
 	int _num_components;
+	double _threshold;
 	vector<Mat> _projections;
 	vector<int> _labels;
 	Mat _eigenvectors;
@@ -39,28 +39,30 @@ private:
 public:
 	Eigenfaces() :
 		_num_components(0),
-		_dataAsRow(true) {};
+		_threshold(DBL_MAX) {};
+
 	//! create empty eigenfaces with num_components
-	Eigenfaces(int num_components, bool dataAsRow = true) :
+	Eigenfaces(int num_components, double threshold = DBL_MAX) :
 		_num_components(num_components),
-		_dataAsRow(dataAsRow) {};
+		_threshold(threshold) {};
+
 	//! compute num_component eigenfaces for given images in src and corresponding classes in labels
 	Eigenfaces(const vector<Mat>& src,
 			const vector<int>& labels,
 			int num_components = 0,
-			bool dataAsRow = true);
-	//! compute num_component eigenfaces for given images in src and corresponding classes in labels
-	//    default is observation by row, pass dataAsRow = false if observations are given by column
-	Eigenfaces(const Mat& src,
-			const vector<int>& labels,
-			int num_components = 0,
-			bool dataAsRow = true);
+			double threshold = DBL_MAX) :
+			    _num_components(num_components),
+			    _threshold(threshold)
+	{
+	 compute(src, labels);
+	}
+
 	//! computes a PCA for given data
 	void compute(const vector<Mat>& src, const vector<int>& labels);
-	//! computes a PCA for given data
-	void compute(const Mat& src, const vector<int>& labels);
 	//! predicts the label for a given sample
 	int predict(const Mat& src);
+	//! predicts the label for a given sample and the confidence of this prediction
+	void predict(const Mat& src, int &label, double &confidence);
 	//! projects a sample
 	Mat project(const Mat& src);
 	//! reconstructs a sample
