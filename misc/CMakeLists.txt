@@ -26,3 +26,8 @@ target_link_libraries(pca_demo opencv_core opencv_imgproc opencv_highgui)
 ### color found in the image. Based on simple thresholding rules:
 add_executable(skin_color_demo skin_color.cpp)
 target_link_libraries(skin_color_demo opencv_core opencv_imgproc opencv_highgui)
+
+### The tan_triggs_preprocessing can be called with an image, and will display 
+### the illumination normalized image:
+add_executable(tan_triggs_preprocessing tan_triggs.cpp)
+target_link_libraries(tan_triggs_preprocessing opencv_core opencv_imgproc opencv_highgui)
