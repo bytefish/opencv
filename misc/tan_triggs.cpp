@@ -55,7 +55,7 @@ Mat norm_0_255(const Mat& src) {
 //
 // Default parameters are taken from the paper.
 //
-static Mat tan_triggs_preprocessing(InputArray src,
+Mat tan_triggs_preprocessing(InputArray src,
         float alpha = 0.1, float tau = 10.0, float gamma = 0.2, int sigma0 = 1,
         int sigma1 = 2) {
 
