@@ -103,9 +103,9 @@ Mat tan_triggs_preprocessing(InputArray src,
     // Squash into the tanh:
     {
         Mat exp_x, exp_negx;
-			    	exp( I / tau, exp_x );
-				    exp( -I / tau, exp_negx );
-				    divide( exp_x - exp_negx, exp_x + exp_negx, I );
+	exp( I / tau, exp_x );
+	exp( -I / tau, exp_negx );
+	divide( exp_x - exp_negx, exp_x + exp_negx, I );
         I = tau * I;
     }
     return I;
