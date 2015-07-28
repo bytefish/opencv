@@ -102,11 +102,10 @@ Mat tan_triggs_preprocessing(InputArray src,
 
     // Squash into the tanh:
     {
-        for(int r = 0; r < I.rows; r++) {
-            for(int c = 0; c < I.cols; c++) {
-                I.at<float>(r,c) = tanh(I.at<float>(r,c) / tau);
-            }
-        }
+        Mat exp_x, exp_negx;
+	exp( I / tau, exp_x );
+	exp( -I / tau, exp_negx );
+	divide( exp_x - exp_negx, exp_x + exp_negx, I );
         I = tau * I;
     }
     return I;
