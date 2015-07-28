@@ -74,8 +74,8 @@ Mat tan_triggs_preprocessing(InputArray src,
         // Make them odd for OpenCV:
         kernel_sz0 += ((kernel_sz0 % 2) == 0) ? 1 : 0;
         kernel_sz1 += ((kernel_sz1 % 2) == 0) ? 1 : 0;
-        GaussianBlur(I, gaussian0, Size(kernel_sz0,kernel_sz0), sigma0, sigma0, BORDER_CONSTANT);
-        GaussianBlur(I, gaussian1, Size(kernel_sz1,kernel_sz1), sigma1, sigma1, BORDER_CONSTANT);
+        GaussianBlur(I, gaussian0, Size(kernel_sz0,kernel_sz0), sigma0, sigma0, BORDER_REPLICATE);
+        GaussianBlur(I, gaussian1, Size(kernel_sz1,kernel_sz1), sigma1, sigma1, BORDER_REPLICATE);
         subtract(gaussian0, gaussian1, I);
     }
 
