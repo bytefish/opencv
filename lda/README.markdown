@@ -1,16 +1,4 @@
-# !!!!!!!!!!!!!!!!!!!!!!!!!!! # 
-# 					NOTE 							#
-# !!!!!!!!!!!!!!!!!!!!!!!!!!! # 
-
-## PLEASE USE LIBFACEREC ##
-
-This repository is here for educational purpose, as it might be interesting to someone. Please use libfacerec at:
-
-* http://www.github.com/bytefish/libfacerec
-
-This contains all these algorithms with Unit Tests and a nice API.
-
-# bytefish/opencv/lda #
+# lda #
 
 
 This project implements the Fisherfaces method as described in: P. Belhumeur, J. Hespanha, and D. Kriegman, "Eigenfaces vs. Fisherfaces: Recognition Using Class Specific Linear Projection", IEEE Transactions on Pattern Analysis and Machine Intelligence, 19(7):711--720, 1997.

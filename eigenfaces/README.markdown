@@ -1,16 +1,4 @@
-# !!!!!!!!!!!!!!!!!!!!!!!!!!! # 
-# 					NOTE 							#
-# !!!!!!!!!!!!!!!!!!!!!!!!!!! # 
-
-## PLEASE USE LIBFACEREC ##
-
-This repository is here for educational purpose, as it might be interesting to someone. Please use libfacerec at:
-
-* http://www.github.com/bytefish/libfacerec
-
-This contains all these algorithms with Unit Tests and a nice API.
-
-# bytefish/opencv/eigenfaces #
+# eigenfaces #
 
 This project implements the Eigenfaces method as described in: Turk and Pentland, "Eigenfaces for recognition.", Journal of Cognitive Neuroscience
 3 (1991), 71–86.

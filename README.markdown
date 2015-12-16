@@ -62,11 +62,10 @@ Basic code for spatial histograms and histogram matching with a chi-square dista
   
 ## lda ##
 
-Fisherfaces implementation with the OpenCV2 C++ API. Here's my [answer on stackoverflow.com](http://stackoverflow.com/questions/7574623/c-face-detection-recognition-implementations/7864357#7864357) and here's my [blog post on Fisherfaces in OpenCV](http://www.bytefish.de/blog/fisherfaces_in_opencv). If you want some insights how this stuff works, you can read through [my post and experiments with Fisherfaces and Eigenfaces](http://www.bytefish.de/blog/fisherfaces).
+Fisherfaces implementation with the OpenCV2 C++ API. 
 
 ### Related posts ###
 
 * http://www.bytefish.de/blog/fisherfaces
 * http://www.bytefish.de/blog/lda_in_opencv
 * http://www.bytefish.de/blog/fisherfaces_in_opencv
-
