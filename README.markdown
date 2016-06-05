@@ -58,7 +58,7 @@ Basic code for spatial histograms and histogram matching with a chi-square dista
 ### Related posts ###
 
 * http://www.bytefish.de/blog/local_binary_patterns
-* http://www.bytefish.de/wiki/python/numpy/performance
+* http://www.bytefish.de/blog/numpy_performance/
   
 ## lda ##
 
