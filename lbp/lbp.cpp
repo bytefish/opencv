@@ -6,18 +6,23 @@ template <typename _Tp>
 void lbp::OLBP_(const Mat& src, Mat& dst) {
 	dst = Mat::zeros(src.rows-2, src.cols-2, CV_8UC1);
 	for(int i=1;i<src.rows-1;i++) {
+		const uchar* rowPtr_prev = src.ptr<const uchar>(i-1);
+		const uchar* rowPtr_this = src.ptr<const uchar>(i);
+		const uchar* rowPtr_next = src.ptr<const uchar>(i+1);
+		uchar* destPtr = dst.ptr<uchar>(i);
 		for(int j=1;j<src.cols-1;j++) {
-			_Tp center = src.at<_Tp>(i,j);
+			_Tp center = rowPtr_this[j];
 			unsigned char code = 0;
-			code |= (src.at<_Tp>(i-1,j-1) > center) << 7;
-			code |= (src.at<_Tp>(i-1,j) > center) << 6;
-			code |= (src.at<_Tp>(i-1,j+1) > center) << 5;
-			code |= (src.at<_Tp>(i,j+1) > center) << 4;
-			code |= (src.at<_Tp>(i+1,j+1) > center) << 3;
-			code |= (src.at<_Tp>(i+1,j) > center) << 2;
-			code |= (src.at<_Tp>(i+1,j-1) > center) << 1;
-			code |= (src.at<_Tp>(i,j-1) > center) << 0;
-			dst.at<unsigned char>(i-1,j-1) = code;
+			code |= (rowPtr_prev[j - 1] > center) << 7;
+			code |= (rowPtr_prev[j] > center) << 6;
+			code |= (rowPtr_prev[j + 1] > center) << 5;
+			code |= (rowPtr_this[j + 1] > center) << 4;
+			code |= (rowPtr_next[j + 1] > center) << 3;
+			code |= (rowPtr_next[j] > center) << 2;
+			code |= (rowPtr_next[j - 1] > center) << 1;
+			code |= (rowPtr_this[j - 1] > center) << 0;
+
+			destPtr[j] = code;
 		}
 	}
 }
