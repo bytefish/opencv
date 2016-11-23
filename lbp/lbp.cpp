@@ -4,13 +4,13 @@ using namespace cv;
 
 template <typename _Tp>
 void lbp::OLBP_(const Mat& src, Mat& dst) {
-	dst = Mat::zeros(src.rows-2, src.cols-2, CV_8UC1);
-	for(int i=1;i<src.rows-1;i++) {
-		const uchar* rowPtr_prev = src.ptr<const uchar>(i-1);
-		const uchar* rowPtr_this = src.ptr<const uchar>(i);
-		const uchar* rowPtr_next = src.ptr<const uchar>(i+1);
+	dst = Mat::zeros(src.rows - 2, src.cols - 2, CV_8UC1);
+	for(int i = 1; i < src.rows - 1; i++) {
+		const _Tp* rowPtr_prev = src.ptr<const _Tp>( i - 1 );
+		const _Tp* rowPtr_this = src.ptr<const _Tp>( i );
+		const _Tp* rowPtr_next = src.ptr<const _Tp>( i + 1);
 		uchar* destPtr = dst.ptr<uchar>(i);
-		for(int j=1;j<src.cols-1;j++) {
+		for(int j = 1; j< src.cols - 1 ; j++) {
 			_Tp center = rowPtr_this[j];
 			unsigned char code = 0;
 			code |= (rowPtr_prev[j - 1] > center) << 7;
@@ -54,10 +54,14 @@ void lbp::ELBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 		float w4 =      tx  *      ty;
 		// iterate through your data
 		for(int i=radius; i < src.rows-radius;i++) {
+			_Tp* destPtr = dst.ptr<_Tp>(i);
+			_Tp* destPtr_r = dst.ptr<_Tp>(i - radius);
+			const _Tp* srcPtr_fy = src.ptr<const _Tp>(i + fy);
+			const _Tp* srcPtr_cy = src.ptr<const _Tp>(i + cy);
 			for(int j=radius;j < src.cols-radius;j++) {
-				float t = w1*src.at<_Tp>(i+fy,j+fx) + w2*src.at<_Tp>(i+fy,j+cx) + w3*src.at<_Tp>(i+cy,j+fx) + w4*src.at<_Tp>(i+cy,j+cx);
+				float t = w1*srcPtr_fy[j + fx] + w2*srcPtr_fy[j + cx] + w3*srcPtr_cy[j + fx] + w4*srcPtr_cy[ j + cx];
 				// we are dealing with floating point precision, so add some little tolerance
-				dst.at<unsigned int>(i-radius,j-radius) += ((t > src.at<_Tp>(i,j)) && (abs(t-src.at<_Tp>(i,j)) > std::numeric_limits<float>::epsilon())) << n;
+				destPtr_r[j - radius] += ((t > destPtr[j]) && (abs(t-destPtr[j]) > std::numeric_limits<float>::epsilon())) << n;
 			}
 		}
 	}
@@ -90,18 +94,25 @@ void lbp::VARLBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 		float w4 =      tx  *      ty;
 		// iterate through your data
 		for(int i=radius; i < src.rows-radius;i++) {
+			float* _deltaPtr = _delta.ptr<float>(i);
+			float* _meanPtr = _mean.ptr<float>(i);
+			float* _m2Ptr = _m2.ptr<float>(i);
+			const _Tp* srcPtr_fy = src.ptr<const _Tp>(i + fy);
+			const _Tp* srcPtr_cy = src.ptr<const _Tp>(i + cy);
 			for(int j=radius;j < src.cols-radius;j++) {
-				float t = w1*src.at<_Tp>(i+fy,j+fx) + w2*src.at<_Tp>(i+fy,j+cx) + w3*src.at<_Tp>(i+cy,j+fx) + w4*src.at<_Tp>(i+cy,j+cx);
-				_delta.at<float>(i,j) = t - _mean.at<float>(i,j);
-				_mean.at<float>(i,j) = (_mean.at<float>(i,j) + (_delta.at<float>(i,j) / (1.0*(n+1)))); // i am a bit paranoid
-				_m2.at<float>(i,j) = _m2.at<float>(i,j) + _delta.at<float>(i,j) * (t - _mean.at<float>(i,j));
+				float t = w1*srcPtr_fy[j + fx] + w2*srcPtr_fy[j + cx] + w3*srcPtr_cy[j + fx] + w4*srcPtr_cy[j + cx];
+				_deltaPtr[j] = t - _meanPtr[j];
+				_meanPtr[j] = (_meanPtr[j] + (_deltaPtr[j]) / (1.0*(n+1))); // i am a bit paranoid
+				_m2Ptr[j] += + _deltaPtr[j] * (t - _meanPtr[j]);
 			}
 		}
 	}
 	// calculate result
 	for(int i = radius; i < src.rows-radius; i++) {
+		_Tp* destPtr_r = dst.ptr<_Tp>(i - radius);
+		float* _m2Ptr = _m2.ptr<float>(i);
 		for(int j = radius; j < src.cols-radius; j++) {
-			dst.at<float>(i-radius, j-radius) = _m2.at<float>(i,j) / (1.0*(neighbors-1));
+			destPtr_r[j - radius] = _m2Ptr[j] / (1.0*(neighbors-1));
 		}
 	}
 }
