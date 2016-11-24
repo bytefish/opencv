@@ -25,7 +25,6 @@ void lbp::OLBP_(const Mat& src, Mat& dst) {
 			code |= (rowPtr_next[j] > center) << 2;
 			code |= (rowPtr_next[j - 1] > center) << 1;
 			code |= (rowPtr_this[j - 1] > center) << 0;
-
 			destPtr[j] = code;
 		}
 	}
@@ -115,9 +114,8 @@ void lbp::VARLBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 	for(int i = radius; i < src.rows-radius; i++) {
 		float* destPtr_r = dst.ptr<float>(i - radius);
 		float* _m2Ptr = _m2.ptr<float>(i);
-		for(int j = radius; j < src.cols-radius; j++) {
+		for(int j = radius; j < src.cols-radius; j++)
 			destPtr_r[j - radius] = _m2Ptr[j] / (1.0*(neighbors-1));
-		}
 	}
 }
 
