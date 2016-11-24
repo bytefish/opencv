@@ -60,7 +60,7 @@ void lbp::ELBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 			int* destPtr_r = dst.ptr<int>(i - radius);
 			const _Tp* srcPtr_fy = src.ptr<const _Tp>(i + fy);
 			const _Tp* srcPtr_cy = src.ptr<const _Tp>(i + cy);
-            const _Tp* srcPtr = src.ptr<const _Tp>(i);
+            		const _Tp* srcPtr = src.ptr<const _Tp>(i);
 			for(int j=radius;j < src.cols-radius;j++) {
 				float t = w1*srcPtr_fy[j + fx] + w2*srcPtr_fy[j + cx] + w3*srcPtr_cy[j + fx] + w4*srcPtr_cy[ j + cx];
 				// we are dealing with floating point precision, so add some little tolerance
