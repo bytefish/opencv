@@ -58,14 +58,14 @@ void lbp::ELBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 		float w4 =      tx  *      ty;
 		// iterate through your data
 		for(int i=radius; i < src.rows-radius;i++) {
-			_Tp* destPtr = dst.ptr<_Tp>(i);
-			_Tp* destPtr_r = dst.ptr<_Tp>(i - radius);
+			int* destPtr_r = dst.ptr<int>(i - radius);
 			const _Tp* srcPtr_fy = src.ptr<const _Tp>(i + fy);
 			const _Tp* srcPtr_cy = src.ptr<const _Tp>(i + cy);
+            const _Tp* srcPtr = src.ptr<const _Tp>(i);
 			for(int j=radius;j < src.cols-radius;j++) {
 				float t = w1*srcPtr_fy[j + fx] + w2*srcPtr_fy[j + cx] + w3*srcPtr_cy[j + fx] + w4*srcPtr_cy[ j + cx];
 				// we are dealing with floating point precision, so add some little tolerance
-				destPtr_r[j - radius] += ((t > destPtr[j]) && (abs(t-destPtr[j]) > std::numeric_limits<float>::epsilon())) << n;
+				destPtr_r[j - radius] += ((t > srcPtr[j]) && (abs(t-srcPtr[j]) > std::numeric_limits<float>::epsilon())) << n;
 			}
 		}
 	}
@@ -107,13 +107,13 @@ void lbp::VARLBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 				float t = w1*srcPtr_fy[j + fx] + w2*srcPtr_fy[j + cx] + w3*srcPtr_cy[j + fx] + w4*srcPtr_cy[j + cx];
 				_deltaPtr[j] = t - _meanPtr[j];
 				_meanPtr[j] = (_meanPtr[j] + (_deltaPtr[j]) / (1.0*(n+1))); // i am a bit paranoid
-				_m2Ptr[j] += + _deltaPtr[j] * (t - _meanPtr[j]);
+				_m2Ptr[j] = _m2Ptr[j] + _deltaPtr[j] * (t - _meanPtr[j]);
 			}
 		}
 	}
 	// calculate result
 	for(int i = radius; i < src.rows-radius; i++) {
-		_Tp* destPtr_r = dst.ptr<_Tp>(i - radius);
+		float* destPtr_r = dst.ptr<float>(i - radius);
 		float* _m2Ptr = _m2.ptr<float>(i);
 		for(int j = radius; j < src.cols-radius; j++) {
 			destPtr_r[j - radius] = _m2Ptr[j] / (1.0*(neighbors-1));
@@ -121,6 +121,7 @@ void lbp::VARLBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 	}
 }
 
+ 
 // now the wrapper functions
 void lbp::OLBP(const Mat& src, Mat& dst) {
 	switch(src.type()) {
