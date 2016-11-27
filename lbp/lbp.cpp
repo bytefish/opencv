@@ -1,23 +1,31 @@
 #include "lbp.hpp"
 
+#ifndef M_PI
+	const double M_PI = 3.1415926535897932384626433832795;
+#endif
+
 using namespace cv;
 
 template <typename _Tp>
 void lbp::OLBP_(const Mat& src, Mat& dst) {
-	dst = Mat::zeros(src.rows-2, src.cols-2, CV_8UC1);
-	for(int i=1;i<src.rows-1;i++) {
-		for(int j=1;j<src.cols-1;j++) {
-			_Tp center = src.at<_Tp>(i,j);
+	dst = Mat::zeros(src.rows - 2, src.cols - 2, CV_8UC1);
+	for(int i = 1; i < src.rows - 1; i++) {
+		const _Tp* rowPtr_prev = src.ptr<const _Tp>( i - 1 );
+		const _Tp* rowPtr_this = src.ptr<const _Tp>( i );
+		const _Tp* rowPtr_next = src.ptr<const _Tp>( i + 1);
+		uchar* destPtr = dst.ptr<uchar>(i);
+		for(int j = 1; j< src.cols - 1 ; j++) {
+			_Tp center = rowPtr_this[j];
 			unsigned char code = 0;
-			code |= (src.at<_Tp>(i-1,j-1) > center) << 7;
-			code |= (src.at<_Tp>(i-1,j) > center) << 6;
-			code |= (src.at<_Tp>(i-1,j+1) > center) << 5;
-			code |= (src.at<_Tp>(i,j+1) > center) << 4;
-			code |= (src.at<_Tp>(i+1,j+1) > center) << 3;
-			code |= (src.at<_Tp>(i+1,j) > center) << 2;
-			code |= (src.at<_Tp>(i+1,j-1) > center) << 1;
-			code |= (src.at<_Tp>(i,j-1) > center) << 0;
-			dst.at<unsigned char>(i-1,j-1) = code;
+			code |= (rowPtr_prev[j - 1] > center) << 7;
+			code |= (rowPtr_prev[j] > center) << 6;
+			code |= (rowPtr_prev[j + 1] > center) << 5;
+			code |= (rowPtr_this[j + 1] > center) << 4;
+			code |= (rowPtr_next[j + 1] > center) << 3;
+			code |= (rowPtr_next[j] > center) << 2;
+			code |= (rowPtr_next[j - 1] > center) << 1;
+			code |= (rowPtr_this[j - 1] > center) << 0;
+			destPtr[j] = code;
 		}
 	}
 }
@@ -32,8 +40,8 @@ void lbp::ELBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 	dst = Mat::zeros(src.rows-2*radius, src.cols-2*radius, CV_32SC1);
 	for(int n=0; n<neighbors; n++) {
 		// sample points
-		float x = static_cast<float>(radius) * cos(2.0*M_PI*n/static_cast<float>(neighbors));
-		float y = static_cast<float>(radius) * -sin(2.0*M_PI*n/static_cast<float>(neighbors));
+		float x = static_cast<float>(radius) * cos(2.0f*M_PI*n/static_cast<float>(neighbors));
+		float y = static_cast<float>(radius) * -sin(2.0f*M_PI*n/static_cast<float>(neighbors));
 		// relative indices
 		int fx = static_cast<int>(floor(x));
 		int fy = static_cast<int>(floor(y));
@@ -49,10 +57,14 @@ void lbp::ELBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 		float w4 =      tx  *      ty;
 		// iterate through your data
 		for(int i=radius; i < src.rows-radius;i++) {
+			int* destPtr_r = dst.ptr<int>(i - radius);
+			const _Tp* srcPtr_fy = src.ptr<const _Tp>(i + fy);
+			const _Tp* srcPtr_cy = src.ptr<const _Tp>(i + cy);
+            		const _Tp* srcPtr = src.ptr<const _Tp>(i);
 			for(int j=radius;j < src.cols-radius;j++) {
-				float t = w1*src.at<_Tp>(i+fy,j+fx) + w2*src.at<_Tp>(i+fy,j+cx) + w3*src.at<_Tp>(i+cy,j+fx) + w4*src.at<_Tp>(i+cy,j+cx);
+				float t = float(w1*srcPtr_fy[j + fx] + w2*srcPtr_fy[j + cx] + w3*srcPtr_cy[j + fx] + w4*srcPtr_cy[ j + cx]);
 				// we are dealing with floating point precision, so add some little tolerance
-				dst.at<unsigned int>(i-radius,j-radius) += ((t > src.at<_Tp>(i,j)) && (abs(t-src.at<_Tp>(i,j)) > std::numeric_limits<float>::epsilon())) << n;
+				destPtr_r[j - radius] += ((t > srcPtr[j]) && (abs(t-srcPtr[j]) > std::numeric_limits<float>::epsilon())) << n;
 			}
 		}
 	}
@@ -68,8 +80,8 @@ void lbp::VARLBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 	Mat _m2 = Mat::zeros(src.rows, src.cols, CV_32FC1);
 	for(int n=0; n<neighbors; n++) {
 		// sample points
-		float x = static_cast<float>(radius) * cos(2.0*M_PI*n/static_cast<float>(neighbors));
-		float y = static_cast<float>(radius) * -sin(2.0*M_PI*n/static_cast<float>(neighbors));
+		float x = static_cast<float>(radius) * cos(2.0f*M_PI*n/static_cast<float>(neighbors));
+		float y = static_cast<float>(radius) * -sin(2.0f*M_PI*n/static_cast<float>(neighbors));
 		// relative indices
 		int fx = static_cast<int>(floor(x));
 		int fy = static_cast<int>(floor(y));
@@ -85,22 +97,29 @@ void lbp::VARLBP_(const Mat& src, Mat& dst, int radius, int neighbors) {
 		float w4 =      tx  *      ty;
 		// iterate through your data
 		for(int i=radius; i < src.rows-radius;i++) {
+			float* _deltaPtr = _delta.ptr<float>(i);
+			float* _meanPtr = _mean.ptr<float>(i);
+			float* _m2Ptr = _m2.ptr<float>(i);
+			const _Tp* srcPtr_fy = src.ptr<const _Tp>(i + fy);
+			const _Tp* srcPtr_cy = src.ptr<const _Tp>(i + cy);
 			for(int j=radius;j < src.cols-radius;j++) {
-				float t = w1*src.at<_Tp>(i+fy,j+fx) + w2*src.at<_Tp>(i+fy,j+cx) + w3*src.at<_Tp>(i+cy,j+fx) + w4*src.at<_Tp>(i+cy,j+cx);
-				_delta.at<float>(i,j) = t - _mean.at<float>(i,j);
-				_mean.at<float>(i,j) = (_mean.at<float>(i,j) + (_delta.at<float>(i,j) / (1.0*(n+1)))); // i am a bit paranoid
-				_m2.at<float>(i,j) = _m2.at<float>(i,j) + _delta.at<float>(i,j) * (t - _mean.at<float>(i,j));
+				float t = float(w1*srcPtr_fy[j + fx] + w2*srcPtr_fy[j + cx] + w3*srcPtr_cy[j + fx] + w4*srcPtr_cy[j + cx]);
+				_deltaPtr[j] = t - _meanPtr[j];
+				_meanPtr[j] = (_meanPtr[j] + (_deltaPtr[j]) / (1.0f*(n+1))); // i am a bit paranoid
+				_m2Ptr[j] = _m2Ptr[j] + _deltaPtr[j] * (t - _meanPtr[j]);
 			}
 		}
 	}
 	// calculate result
 	for(int i = radius; i < src.rows-radius; i++) {
-		for(int j = radius; j < src.cols-radius; j++) {
-			dst.at<float>(i-radius, j-radius) = _m2.at<float>(i,j) / (1.0*(neighbors-1));
-		}
+		float* destPtr_r = dst.ptr<float>(i - radius);
+		float* _m2Ptr = _m2.ptr<float>(i);
+		for(int j = radius; j < src.cols-radius; j++)
+			destPtr_r[j - radius] = _m2Ptr[j] / (1.0f*(neighbors-1));
 	}
 }
 
+ 
 // now the wrapper functions
 void lbp::OLBP(const Mat& src, Mat& dst) {
 	switch(src.type()) {
