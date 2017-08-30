@@ -2,7 +2,7 @@
 
 This repository contains OpenCV code and documents.
 
-More (maybe) here: [http://www.bytefish.de](http://www.bytefish.de).
+More (maybe) here: [https://www.bytefish.de](https://www.bytefish.de).
 
 ## colormaps ##
 
@@ -10,7 +10,7 @@ An implementation of various colormaps for OpenCV2 C++ in order to enhance visua
 
 ### Related posts ###
 
-* http://bytefish.de/blog/colormaps_in_opencv
+* https://bytefish.de/blog/colormaps_in_opencv
   
 ## misc ##
 
@@ -32,8 +32,8 @@ Document and sourcecode about OpenCV C++ machine learning API including:
 
 ### Related posts ###
   
-* http://www.bytefish.de/blog/machine_learning_with_opencv
-* http://www.bytefish.de/wiki/machine_learning_opencv
+* https://www.bytefish.de/blog/machine_learning_with_opencv
+* https://www.bytefish.de/wiki/machine_learning_opencv
 
 ## eigenfaces ##
 
@@ -41,9 +41,9 @@ Eigenfaces implementation using the OpenCV2 C++ API. There's a very basic functi
 
 ### Related posts ###
 
-* http://www.bytefish.de/blog/pca_in_opencv
-* http://www.bytefish.de/blog/eigenfaces
-* http://www.bytefish.de/blog/fisherfaces
+* https://www.bytefish.de/blog/pca_in_opencv
+* https://www.bytefish.de/blog/eigenfaces
+* https://www.bytefish.de/blog/fisherfaces
   
 ## lbp ##
 
@@ -57,8 +57,8 @@ Basic code for spatial histograms and histogram matching with a chi-square dista
 
 ### Related posts ###
 
-* http://www.bytefish.de/blog/local_binary_patterns
-* http://www.bytefish.de/blog/numpy_performance/
+* https://www.bytefish.de/blog/local_binary_patterns
+* https://www.bytefish.de/blog/numpy_performance/
   
 ## lda ##
 
@@ -66,6 +66,6 @@ Fisherfaces implementation with the OpenCV2 C++ API.
 
 ### Related posts ###
 
-* http://www.bytefish.de/blog/fisherfaces
-* http://www.bytefish.de/blog/lda_in_opencv
-* http://www.bytefish.de/blog/fisherfaces_in_opencv
+* https://www.bytefish.de/blog/fisherfaces
+* https://www.bytefish.de/blog/lda_in_opencv
+* https://www.bytefish.de/blog/fisherfaces_in_opencv
