@@ -32,8 +32,7 @@ Document and sourcecode about OpenCV C++ machine learning API including:
 
 ### Related posts ###
   
-* https://www.bytefish.de/blog/machine_learning_with_opencv
-* https://www.bytefish.de/wiki/machine_learning_opencv
+* https://www.bytefish.de/blog/machine_learning_opencv
 
 ## eigenfaces ##
 
